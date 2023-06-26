@@ -5,6 +5,6 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	api := app.Group("/api") // Group endpoints with param 'api' and log whenever this endpoint is hit.
+	api := app.Group("/api")
 	SetupUserRoutes(api)
 }

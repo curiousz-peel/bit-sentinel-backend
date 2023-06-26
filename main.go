@@ -25,7 +25,7 @@ import (
 // type Course struct {
 // 	ID     int    `json:"id"`
 // 	Title  string `json:"title"`
-// 	Author Author `json:"author"`
+// 	Author []Author `json:"author"`
 // 	//need to decide on the Content type..
 // 	Content   []Media   `json:"content"`
 // 	Tags      []string  `json:"tags"`
@@ -34,17 +34,11 @@ import (
 // 	Rating    float32   `json:"rating"`
 // }
 
-// type Subscription struct {
-// 	ID        int       `json:"id"`
-// 	Type      string    `json:"type"`
-// 	ExpiresAt time.Time `json:"expiresAt"`
-// 	Price     int       `json:"price"`
-// }
-
 // type Account struct {
 // 	ID               int          `json:"id"`
 // 	User             User         `json:"user"`
 // 	Subscription     Subscription `json:"subscription"`
+//  SubscriptionExpiry time.Time  `json:"subscriptionExpiry"`
 // 	Courses          []Course     `json:"courses"`
 // 	RegistrationDate time.Time    `json:"registrationDate"`
 // }

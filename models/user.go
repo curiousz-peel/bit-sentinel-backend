@@ -12,7 +12,7 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:uuid"`
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
+	Email     string    `json:"email" gorm:"unique"`
 	Password  string    `json:"password"`
 	Birthday  time.Time `json:"birthday"`
 	IsMod     bool      `json:"isModerator"`

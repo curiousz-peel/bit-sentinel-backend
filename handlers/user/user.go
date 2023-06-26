@@ -7,6 +7,7 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func GetUsers(ctx *fiber.Ctx) error {
@@ -79,7 +80,16 @@ func DeleteUserByID(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 			"message": "user ID cannot be empty on delete"})
 	}
-	err := storage.DB.Delete(user, id).Error
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "invalid user ID",
+			"data":    err.Error(),
+		})
+	}
+
+	err = storage.DB.Delete(user, uuid).Error
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not delete user",
@@ -117,22 +127,17 @@ func UpdateUserByID(ctx *fiber.Ctx) error {
 	err = ctx.BodyParser(&updateUserData)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "bad input. you can only update first name, last name, email or password fields",
+			"message": "bad input: you can only update first name, last name, email or password fields",
 			"data":    err})
 		return err
 	}
 
-	// user.FirstName = updateUserData.FirstName
-	// user.LastName = updateUserData.LastName
-	// user.Email = updateUserData.Email
-	// user.Password = updateUserData.Password
-
-	// storage.DB.Save(user)
 	storage.DB.Model(&user).Updates(&models.User{
 		FirstName: updateUserData.FirstName,
 		LastName:  updateUserData.LastName,
 		Email:     updateUserData.Email,
 		Password:  updateUserData.Password})
+
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "user updated successfully",
 		"data":    user})
