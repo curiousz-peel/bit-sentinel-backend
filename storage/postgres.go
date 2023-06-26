@@ -2,28 +2,35 @@ package storage
 
 import (
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/curiousz-peel/web-learning-platform-backend/config"
+	"github.com/curiousz-peel/web-learning-platform-backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-type Config struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	DBName   string
-	SSLMode  string
-}
+var DB *gorm.DB
 
-func NewConnection(config *Config) (*gorm.DB, error) {
+func ConnectDb() {
+	config, err := config.InitDbConfig()
+	if err != nil {
+		log.Fatal("could not initialize config")
+	}
+
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		config.Host, config.Port, config.User, config.Password, config.DBName, config.SSLMode,
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		log.Fatal("could not connect to the database! \n", err.Error())
+		os.Exit(2)
 	}
-	return db, nil
+	log.Println("connected to the database successfully")
+	log.Println("starting migrations")
+	db.AutoMigrate(&models.User{})
+
+	DB = db
 }
