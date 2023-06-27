@@ -38,7 +38,7 @@ import (
 // 	ID               int          `json:"id"`
 // 	User             User         `json:"user"`
 // 	Subscription     Subscription `json:"subscription"`
-//  SubscriptionExpiry time.Time  `json:"subscriptionExpiry"`
+//  SubscriptionExpiry time.Time  `json:"subscriptionExpiry`
 // 	Courses          []Course     `json:"courses"`
 // 	RegistrationDate time.Time    `json:"registrationDate"`
 // }
