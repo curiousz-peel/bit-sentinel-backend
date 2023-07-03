@@ -23,6 +23,7 @@ func ConnectDb() {
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		config.Host, config.Port, config.User, config.Password, config.DBName, config.SSLMode,
 	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("could not connect to the database! \n", err.Error())
@@ -30,7 +31,7 @@ func ConnectDb() {
 	}
 	log.Println("connected to the database successfully")
 	log.Println("starting migrations")
-	db.AutoMigrate(&models.User{}, &models.Subscription{})
+	db.AutoMigrate(&models.User{}, &models.Subscription{}, &models.Author{})
 
 	//pass the created db connection to the global DB variable
 	DB = db

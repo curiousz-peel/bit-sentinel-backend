@@ -6,13 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// type Author struct {
-// 	ID          int      `json:"id"`
-// 	User        User     `json:"user"`
-// 	Profession  string   `json:"profession"`
-// 	Description string   `json:"description"`
-// 	Topics      []string `json:"topics"`
-// }
+// ORDER: Author, Media, Course, Account
 
 // type Media struct {
 // 	ID        int       `json:"id"`

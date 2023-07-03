@@ -59,7 +59,7 @@ func GetRecordByID(ctx *fiber.Ctx, model interface{}, idParamName string) error 
 			"message": modelName + " ID cannot be empty on get",
 			"data":    nil})
 	}
-	res := storage.DB.Where("id = ?", id).Find(model)
+	res := storage.DB.Debug().Where("id = ?", id).Find(model)
 	if res.Error != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "error while fetching the " + modelName,
