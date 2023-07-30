@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 	"strings"
@@ -23,6 +24,7 @@ func CreateRecord(ctx *fiber.Ctx, model interface{}) error {
 
 	err = storage.DB.Create(modelBody).Error
 	if err != nil {
+		fmt.Println(err)
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create " + modelName,
 			"data":    err})
@@ -95,7 +97,7 @@ func DeleteRecordByID(ctx *fiber.Ctx, model interface{}, idParamName string) err
 		}
 	}
 
-	res := storage.DB.Where("id = ?", id).Delete(&model)
+	res := storage.DB.Where("id = ?", id).Unscoped().Delete(&model)
 	if res.Error != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "error while deleting " + modelName,

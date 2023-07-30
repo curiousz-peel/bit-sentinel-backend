@@ -1,12 +1,13 @@
 package main
 
 import (
+	mail "github.com/curiousz-peel/web-learning-platform-backend/mailer"
 	"github.com/curiousz-peel/web-learning-platform-backend/routes"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 	"github.com/gofiber/fiber/v2"
 )
 
-// ORDER: Author, Media, Course, Account
+// ORDER OF IMPLEMENTATION: Author, Media, Course, Account
 
 // type Media struct {
 // 	ID        int       `json:"id"`
@@ -40,6 +41,7 @@ import (
 func main() {
 
 	storage.ConnectDb()
+	mail.InitMail()
 
 	app := fiber.New()
 	routes.SetupRoutes(app)

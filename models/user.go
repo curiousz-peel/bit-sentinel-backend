@@ -2,10 +2,10 @@ package models
 
 import (
 	"errors"
-	"net/mail"
 	"time"
-	"unicode"
 
+	mailer "github.com/curiousz-peel/web-learning-platform-backend/mailer"
+	validator "github.com/curiousz-peel/web-learning-platform-backend/validator"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -22,42 +22,12 @@ type User struct {
 	IsMod     bool      `json:"isModerator" gorm:"default:false"`
 }
 
-func validatePassword(pass string) (err error) {
-	var upper, lower, special, number bool
-	for _, char := range pass {
-		switch {
-		case unicode.IsNumber(char):
-			number = true
-		case unicode.IsLower(char):
-			lower = true
-		case unicode.IsUpper(char):
-			upper = true
-		case unicode.IsPunct(char) || unicode.IsSymbol(char):
-			special = true
-		default:
-		}
-	}
-
-	if !(lower && upper && number && special && (len(pass) >= 6)) {
-		return errors.New("password must be of length >= 6 and have at least 1 of :digit, upper case letter, lower case letter and special character")
-	}
-	return nil
-}
-
-func validateEmail(email string) (err error) {
-	_, err = mail.ParseAddress(email)
-	if err != nil {
-		return errors.New("invalid email")
-	}
-	return
-}
-
 func (u *User) isValid() (err error) {
-	err = validatePassword(u.Password)
+	err = validator.ValidatePassword(u.Password)
 	if err != nil {
 		return err
 	}
-	err = validateEmail(u.Email)
+	err = validator.ValidateEmail(u.Email)
 	if err != nil {
 		return err
 	}
@@ -70,5 +40,11 @@ func (u *User) isValid() (err error) {
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	u.ID = uuid.New()
 	err = u.isValid()
+	return
+}
+
+func (u *User) AfterCreate(tx *gorm.DB) (err error) {
+	m := mailer.Mailer{AddressTo: u.Email}
+	go m.SendRegistrationEmail()
 	return
 }
