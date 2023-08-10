@@ -28,6 +28,7 @@ func UpdateUserByID(ctx *fiber.Ctx) error {
 		LastName  string `json:"lastName"`
 		Email     string `json:"email"`
 		Password  string `json:"password"`
+		IsAuthor  string `json:"isAuthor"`
 	}
 	return handlers.UpdateRecordByID(ctx, &models.User{}, &updateUser{}, "userId")
 }

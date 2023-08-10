@@ -20,6 +20,7 @@ type User struct {
 	Password  string    `json:"password" gorm:"not null;default:null"`
 	Birthday  time.Time `json:"birthday" gorm:"not null;default:null"`
 	IsMod     bool      `json:"isModerator" gorm:"default:false"`
+	IsAuthor  bool      `json:"isAuthor" gorm:"default:false"`
 }
 
 func (u *User) isValid() (err error) {

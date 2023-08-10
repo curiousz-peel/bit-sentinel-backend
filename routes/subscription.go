@@ -6,10 +6,10 @@ import (
 )
 
 func SetupSubscriptionRoutes(router fiber.Router) {
-	user := router.Group("/subscription")
-	user.Post("/", subscriptionHandler.CreateSubscription)
-	user.Get("/", subscriptionHandler.GetSubscriptions)
-	user.Get("/:subscriptionId", subscriptionHandler.GetSubscriptionByID)
-	user.Put("/:subscriptionId", subscriptionHandler.UpdateSubscriptionByID)
-	user.Delete("/:subscriptionId", subscriptionHandler.DeleteSubscriptionByID)
+	subscription := router.Group("/subscription")
+	subscription.Post("/", subscriptionHandler.CreateSubscription)
+	subscription.Get("/", subscriptionHandler.GetSubscriptions)
+	subscription.Get("/:subscriptionId", subscriptionHandler.GetSubscriptionByID)
+	subscription.Put("/:subscriptionId", subscriptionHandler.UpdateSubscriptionByID)
+	subscription.Delete("/:subscriptionId", subscriptionHandler.DeleteSubscriptionByID)
 }

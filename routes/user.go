@@ -5,16 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// type User struct {
-// 	ID        int       `json:"id"`
-// 	FirstName string    `json:"firstName"`
-// 	LastName  string    `json:"lastName"`
-// 	Email     string    `json:"email"`
-// 	Password  string    `json:"password"`
-// 	Birthday  time.Time `json:"birthday"`
-// 	IsMod     bool      `json:"isModerator"`
-// }
-
 func SetupUserRoutes(router fiber.Router) {
 	user := router.Group("/user")
 	user.Post("/", userHandler.CreateUser)

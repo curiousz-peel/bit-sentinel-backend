@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func GetAuthors(ctx *fiber.Ctx) error {
@@ -35,8 +37,6 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	fmt.Println("here")
-
 	res := storage.DB.Find(&author.User, "id = ?", author.UserID)
 	if res.Error != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
@@ -48,8 +48,6 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 			"message": "could not find a user with id: " + author.UserID.String() + " to link to a new author"})
 		return nil
 	}
-	fmt.Println(author.UserID)
-	fmt.Println(author.User)
 
 	err = storage.DB.Debug().Omit("User").Create(author).Error
 	if err != nil {
@@ -60,18 +58,22 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	// ???
-	// storage.DB.Debug().Model(&author).Association("User").Replace(&author.User)
-	err = storage.DB.Model(author).Updates(models.Author{User: models.User{}}).Error
-	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "could not create author2",
-			"data":    err})
-		fmt.Println(err)
-		return err
+	type updateUserAuthorStatus struct {
+		IsAuthor bool `json:"isAuthor"`
 	}
 
-	fmt.Println("why god")
+	res = storage.DB.Model(&author.User).Updates(updateUserAuthorStatus{IsAuthor: true})
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not update user author status",
+			"data":    res.Error})
+		fmt.Println(res.Error)
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not update the user author status to true"})
+		return nil
+	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "create author succeeded",
@@ -80,119 +82,107 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 
 }
 
-// func CreateUser(ctx *fiber.Ctx) error {
-// 	user := models.User{}
-// 	err := ctx.BodyParser(&user)
-// 	if err != nil {
-// 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
-// 			"message": "request failed",
-// 			"data":    err})
-// 		return err
-// 	}
+func GetAuthorByID(ctx *fiber.Ctx) error {
+	author := &models.Author{}
+	id := ctx.Params("authorId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "author ID cannot be empty on get",
+			"data":    nil})
+	}
 
-// 	err = storage.DB.Create(&user).Error
-// 	if err != nil {
-// 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-// 			"message": "could not create user",
-// 			"data":    err})
-// 		return err
-// 	}
+	res := storage.DB.Where("id = ?", id).Preload("User").Find(author)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the author",
+			"data":    res.Error})
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find author with id: " + id + " to fetch"})
+		return errors.New("could not find author with id: " + id + " to fetch")
+	}
 
-// 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-// 		"message": "create user succeeded",
-// 		"data":    user})
-// 	return nil
-// }
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "author found successfully",
+		"data":    author})
+	return nil
+}
 
-// func GetUserByID(ctx *fiber.Ctx) error {
-// 	user := &models.User{}
-// 	id := ctx.Params("userId")
-// 	if id == "" {
-// 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-// 			"message": "user ID cannot be empty on get",
-// 			"data":    nil})
-// 	}
-// 	fmt.Println("the user id is", id)
-// 	err := storage.DB.Where("id = ?", id).Find(user).Error
-// 	if err != nil {
-// 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-// 			"message": "could not find the user",
-// 			"data":    err})
-// 		return err
-// 	}
-// 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-// 		"message": "user found successfully",
-// 		"data":    user})
-// 	return nil
-// }
+func DeleteAuthorByID(ctx *fiber.Ctx) error {
+	author := &models.Author{}
+	id := ctx.Params("authorId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "author ID cannot be empty on delete",
+			"data":    nil})
+	}
 
-// func DeleteUserByID(ctx *fiber.Ctx) error {
-// 	user := &models.User{}
-// 	id := ctx.Params("userId")
-// 	if id == "" {
-// 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-// 			"message": "user ID cannot be empty on delete"})
-// 	}
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "invalid author ID",
+			"data":    err.Error(),
+		})
+	}
 
-// 	uuid, err := uuid.Parse(id)
-// 	if err != nil {
-// 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-// 			"message": "invalid user ID",
-// 			"data":    err.Error(),
-// 		})
-// 	}
+	res := storage.DB.Unscoped().Delete(author, uuid)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not delete author",
+			"data":    err})
+		return err
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find a user with id: " + uuid.String() + " to delete"})
+		return nil
+	}
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "author deleted successfully"})
+	return nil
+}
 
-// 	err = storage.DB.Delete(user, uuid).Error
-// 	if err != nil {
-// 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-// 			"message": "could not delete user",
-// 			"data":    err})
-// 		return err
-// 	}
-// 	ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "user deleted successfully"})
-// 	return nil
-// }
+func UpdateAuthorByID(ctx *fiber.Ctx) error {
+	type updateAuthor struct {
+		Profession  string `json:"profession"`
+		Description string `json:"description"`
+		Topics      string `json:"topics"`
+	}
+	author := &models.Author{}
+	id := ctx.Params("authorId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "author ID cannot be empty on update",
+			"data":    nil})
+	}
 
-// func UpdateUserByID(ctx *fiber.Ctx) error {
-// 	type updateUser struct {
-// 		FirstName string `json:"firstName"`
-// 		LastName  string `json:"lastName"`
-// 		Email     string `json:"email"`
-// 		Password  string `json:"password"`
-// 	}
-// 	user := &models.User{}
-// 	id := ctx.Params("userId")
-// 	if id == "" {
-// 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-// 			"message": "user ID cannot be empty on get",
-// 			"data":    nil})
-// 	}
-// 	fmt.Println("the user id is", id)
-// 	err := storage.DB.Where("id = ?", id).Find(user).Error
-// 	if err != nil {
-// 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-// 			"message": "could not find the user",
-// 			"data":    err})
-// 		return err
-// 	}
+	res := storage.DB.Where("id = ?", id).Preload("User").Find(author)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the author",
+			"data":    res.Error})
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find the author"})
+		return nil
+	}
 
-// 	var updateUserData updateUser
-// 	err = ctx.BodyParser(&updateUserData)
-// 	if err != nil {
-// 		ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"message": "bad input: you can only update first name, last name, email or password fields",
-// 			"data":    err})
-// 		return err
-// 	}
+	var updateAuthorData updateAuthor
+	err := ctx.BodyParser(&updateAuthorData)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "bad input: you can only update profession, description or topics fields",
+			"data":    err})
+		return err
+	}
 
-// 	storage.DB.Model(&user).Updates(&models.User{
-// 		FirstName: updateUserData.FirstName,
-// 		LastName:  updateUserData.LastName,
-// 		Email:     updateUserData.Email,
-// 		Password:  updateUserData.Password})
+	storage.DB.Model(&author).Updates(&models.Author{
+		Profession:  updateAuthorData.Profession,
+		Description: updateAuthorData.Description,
+		Topics:      updateAuthorData.Topics})
 
-// 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-// 		"message": "user updated successfully",
-// 		"data":    user})
-// 	return nil
-// }
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "author updated successfully",
+		"data":    author})
+	return nil
+}
