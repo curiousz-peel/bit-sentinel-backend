@@ -134,7 +134,7 @@ func DeleteAuthorByID(ctx *fiber.Ctx) error {
 		return err
 	} else if res.RowsAffected == 0 {
 		ctx.Status(http.StatusOK).JSON(&fiber.Map{
-			"message": "could not find a user with id: " + uuid.String() + " to delete"})
+			"message": "could not find an author with id: " + uuid.String() + " to delete"})
 		return nil
 	}
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "author deleted successfully"})

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/handlers"
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
@@ -64,13 +65,18 @@ func CreateSubscriptionPlans(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	fmt.Println(subscriptionPlan)
-
 	res := storage.DB.Find(&subscriptionPlan.Subscription, "id = ?", subscriptionPlan.SubscriptionID)
 	if res.Error != nil {
 		return errors.New("error in finding subscription: " + subscriptionPlan.Subscription.Type + " with error " + res.Error.Error())
 	} else if res.RowsAffected == 0 {
 		return errors.New("could not find subscription: " + subscriptionPlan.Subscription.Type + " with error " + res.Error.Error())
+	}
+
+	subscriptionPlan.CreatedAt = time.Now()
+	subscriptionPlan.StartDate = time.Now()
+
+	if subscriptionPlan.SubscriptionID != 1 {
+		subscriptionPlan.EndDate = time.Now().Add(time.Hour * 24 * time.Duration(subscriptionPlan.Subscription.Duration))
 	}
 
 	err = storage.DB.Create(subscriptionPlan).Error
@@ -84,11 +90,54 @@ func CreateSubscriptionPlans(ctx *fiber.Ctx) error {
 }
 
 func GetSubscriptionPlanByID(ctx *fiber.Ctx) error {
-	return handlers.GetRecordByID(ctx, &models.SubscriptionPlan{}, "subscriptionPlanId")
+	subscriptionPlan := &models.SubscriptionPlan{}
+	id := ctx.Params("subscriptionPlanId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "subscription plan ID cannot be empty on get",
+			"data":    nil})
+	}
+
+	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Subscription").Find(subscriptionPlan)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the subscription plan",
+			"data":    res.Error})
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find subscription plan with id: " + id + " to fetch"})
+		return errors.New("could not find subscription plan with id: " + id + " to fetch")
+	}
+
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "subscription plan found successfully",
+		"data":    subscriptionPlan})
+	return nil
 }
 
 func DeleteSubscriptionPlanByID(ctx *fiber.Ctx) error {
-	return handlers.DeleteRecordByID(ctx, &models.SubscriptionPlan{}, "subscriptionPlanId")
+	subscriptionPlan := &models.SubscriptionPlan{}
+	id := ctx.Params("subscriptionPlanId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "subscription plan ID cannot be empty on delete",
+			"data":    nil})
+	}
+
+	res := storage.DB.Unscoped().Delete(subscriptionPlan, id)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not delete subscription plan",
+			"data":    res.Error})
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find a subscription plan with id: " + id + " to delete"})
+		return nil
+	}
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "subscription plan deleted successfully"})
+	return nil
 }
 
 func UpdateSubscriptionPlanByID(ctx *fiber.Ctx) error {
@@ -96,5 +145,46 @@ func UpdateSubscriptionPlanByID(ctx *fiber.Ctx) error {
 		UserID         uuid.UUID `json:"userID"`
 		SubscriptionID int       `json:"subscriptionID"`
 	}
-	return handlers.UpdateRecordByID(ctx, &models.SubscriptionPlan{}, &updateSubscriptionPlan{}, "subscriptionPlanId")
+	subscriptionPlan := &models.SubscriptionPlan{}
+	id := ctx.Params("subscriptionPlanId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "subscription plan ID cannot be empty on update",
+			"data":    nil})
+	}
+
+	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Subscription").Find(subscriptionPlan)
+	if res.Error != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the subscription plan",
+			"data":    res.Error})
+		return res.Error
+	} else if res.RowsAffected == 0 {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not find the subscription plan"})
+		return nil
+	}
+
+	var updateSubscriptionPlanData updateSubscriptionPlan
+	err := ctx.BodyParser(&updateSubscriptionPlanData)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "bad input: you can only update the user id or the subscription type id",
+			"data":    err})
+		return err
+	}
+
+	storage.DB.Model(&subscriptionPlan).Updates(&models.SubscriptionPlan{
+		SubscriptionID: uint(updateSubscriptionPlanData.SubscriptionID),
+		UserID:         updateSubscriptionPlanData.UserID})
+
+	type UpdateSubscriptionPlanResponse struct {
+		SubscriptionID uint
+		UserID         string
+	}
+
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "subscription plan updated successfully",
+		"data":    UpdateSubscriptionPlanResponse{SubscriptionID: subscriptionPlan.SubscriptionID, UserID: subscriptionPlan.UserID.String()}})
+	return nil
 }

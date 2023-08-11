@@ -36,7 +36,7 @@ func CreateUser(ctx *fiber.Ctx) error {
 	}
 
 	//create Basic subscription when a new user registers
-	basicSubscription := map[string]interface{}{"StartDate": time.Now(),
+	basicSubscription := map[string]interface{}{
 		"EndDate":        time.Now().AddDate(1000, 0, 0),
 		"SubscriptionID": 1,
 		"UserID":         user.ID}
