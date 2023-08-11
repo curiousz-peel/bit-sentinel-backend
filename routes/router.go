@@ -9,4 +9,6 @@ func SetupRoutes(app *fiber.App) {
 	SetupUserRoutes(api)
 	SetupSubscriptionRoutes(api)
 	SetupAuthorRoutes(api)
+	SetupSubscriptionPlanRoutes(api)
+	// SetupMediaRoutes(api)
 }

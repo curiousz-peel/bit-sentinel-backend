@@ -7,15 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// ORDER OF IMPLEMENTATION: Author, Media, Course, Account
+// ORDER OF IMPLEMENTATION: -Author, Course, Account, Quiz
 
-// type Media struct {
-// 	ID        int       `json:"id"`
-// 	CourseID  int       `json:"courseID"`
-// 	FilePath  string    `json:"filePath"`
-// 	FileType  string    `json:"fileType"`
-// 	CreatedAt time.Time `json:"createdAt"`
-// }
+// -Media? split media into pdf & video materials?
+
+//how do you restrict/grant a user access to courses based on its subscription type?
 
 // type Course struct {
 // 	ID     int    `json:"id"`
@@ -27,6 +23,8 @@ import (
 // 	AddedDate time.Time `json:"addedDate"`
 // 	Visible   bool      `json:"visible"`
 // 	Rating    float32   `json:"rating"`
+// 	//maybe subscriptions to which the courses belong?
+//	Subscriptions Subscription `json:"subscription"
 // }
 
 // type Account struct {

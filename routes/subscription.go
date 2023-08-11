@@ -13,3 +13,12 @@ func SetupSubscriptionRoutes(router fiber.Router) {
 	subscription.Put("/:subscriptionId", subscriptionHandler.UpdateSubscriptionByID)
 	subscription.Delete("/:subscriptionId", subscriptionHandler.DeleteSubscriptionByID)
 }
+
+func SetupSubscriptionPlanRoutes(router fiber.Router) {
+	subscriptionPlan := router.Group("/plan")
+	subscriptionPlan.Post("/", subscriptionHandler.CreateSubscriptionPlans)
+	subscriptionPlan.Get("/", subscriptionHandler.GetSubscriptionPlans)
+	subscriptionPlan.Get("/:subscriptionPlanId", subscriptionHandler.GetSubscriptionPlanByID)
+	subscriptionPlan.Put("/:subscriptionPlanId", subscriptionHandler.UpdateSubscriptionPlanByID)
+	subscriptionPlan.Delete("/:subscriptionPlanId", subscriptionHandler.DeleteSubscriptionPlanByID)
+}
