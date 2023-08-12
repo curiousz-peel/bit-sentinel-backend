@@ -12,15 +12,18 @@ import (
 
 type User struct {
 	gorm.Model
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
-	FirstName string    `json:"firstName" gorm:"not null;default:null"`
-	LastName  string    `json:"lastName" gorm:"not null;default:null"`
-	UserName  string    `json:"userName" gorm:"unique;not null;default:null"`
-	Email     string    `json:"email" gorm:"unique;not null;default:null"`
-	Password  string    `json:"password" gorm:"not null;default:null"`
-	Birthday  time.Time `json:"birthday" gorm:"not null;default:null"`
-	IsMod     bool      `json:"isModerator" gorm:"default:false"`
-	IsAuthor  bool      `json:"isAuthor" gorm:"default:false"`
+	ID          uuid.UUID    `gorm:"type:uuid;primaryKey"`
+	FirstName   string       `json:"firstName" gorm:"not null;default:null"`
+	LastName    string       `json:"lastName" gorm:"not null;default:null"`
+	UserName    string       `json:"userName" gorm:"unique;not null;default:null"`
+	Email       string       `json:"email" gorm:"unique;not null;default:null"`
+	Password    string       `json:"password" gorm:"not null;default:null"`
+	Birthday    time.Time    `json:"birthday" gorm:"not null;default:null"`
+	IsMod       bool         `json:"isModerator" gorm:"default:false"`
+	IsAuthor    bool         `json:"isAuthor" gorm:"default:false"`
+	Ratings     []Rating     `json:"ratings"`
+	Comments    []Comment    `json:"comments"`
+	Enrollments []Enrollment `json:"enrollments"`
 }
 
 func (u *User) isValid() (err error) {

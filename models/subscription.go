@@ -23,15 +23,3 @@ type SubscriptionPlan struct {
 	StartDate      time.Time    `json:"startDate" gorm:"default:null"`
 	EndDate        time.Time    `json:"endDate" gorm:"default:null"`
 }
-
-// func (p *SubscriptionPlan) AfterCreate(tx *gorm.DB) (err error) {
-// 	res := storage.DB.Find(&p.Subscription, "id = ?", p.SubscriptionID)
-// 	if res.Error != nil {
-// 		return errors.New("error in finding the subscription with id " + fmt.Sprint(p.SubscriptionID) + " with error: " + res.Error.Error())
-// 	} else if res.RowsAffected == 0 {
-// 		return errors.New("could not find the subscription with id " + fmt.Sprint(p.SubscriptionID) + " with error: " + res.Error.Error())
-// 	}
-// 	storage.DB.Model(&p).Updates(map[string]interface{}{"StartDate": time.Now(),
-// 		"EndDate": time.Now().Add(time.Hour * 24 * time.Duration(p.Subscription.Duration))})
-// 	return nil
-// }
