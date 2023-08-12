@@ -21,9 +21,9 @@ type User struct {
 	Birthday    time.Time    `json:"birthday" gorm:"not null;default:null"`
 	IsMod       bool         `json:"isModerator" gorm:"default:false"`
 	IsAuthor    bool         `json:"isAuthor" gorm:"default:false"`
-	Ratings     []Rating     `json:"ratings"`
-	Comments    []Comment    `json:"comments"`
-	Enrollments []Enrollment `json:"enrollments"`
+	Ratings     []Rating     `json:"ratings" gorm:"type:text"`
+	Comments    []Comment    `json:"comments" gorm:"type:text"`
+	Enrollments []Enrollment `json:"enrollments" gorm:"type:text"`
 }
 
 func (u *User) isValid() (err error) {

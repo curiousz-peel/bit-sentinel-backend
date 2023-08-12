@@ -8,8 +8,8 @@ import (
 type Comment struct {
 	gorm.Model
 	UserID   uuid.UUID `json:"userId" gorm:"not null;default:null"`
-	User     User      `json:"user"`
+	User     User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;type:text"`
 	CourseID uint      `json:"courseId"`
-	Course   Course    `json:"course"`
+	Course   Course    `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;type:text"`
 	Text     string    `json:"text" gorm:"not null;default:null"`
 }

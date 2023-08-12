@@ -11,8 +11,8 @@ type Lesson struct {
 	CourseID   uint    `json:"courseId" gorm:"not null;default:null"`
 	Course     Course  `json:"course"`
 	Summary    string  `json:"summary" gorm:"not null;default:null"`
-	ContentIds []uint  `json:"mediaIds" gorm:"not null;default:null"`
-	Content    []Media `json:"content"`
-	Quizzes    []Quiz  `json:"quizzes"`
+	ContentIds []uint  `json:"mediaIds" gorm:"not null;default:null;type:text"`
+	Content    []Media `json:"content" gorm:"type:text"`
+	Quizzes    []Quiz  `json:"quizzes" gorm:"type:text"`
 	// VideoURL string? maybe not, just parse medias for the .mp4 formats?
 }
