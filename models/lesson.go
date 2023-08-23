@@ -1,18 +1,30 @@
 package models
 
 import (
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 type Lesson struct {
 	gorm.Model
-	Title      string  `json:"title" gorm:"unique;not null;default:null"`
-	Order      int     `json:"order" gorm:"not null;default:null"`
-	CourseID   uint    `json:"courseId" gorm:"not null;default:null"`
-	Course     Course  `json:"course"`
-	Summary    string  `json:"summary" gorm:"not null;default:null"`
-	ContentIds []uint  `json:"mediaIds" gorm:"not null;default:null;type:text"`
-	Content    []Media `json:"content" gorm:"type:text"`
-	Quizzes    []Quiz  `json:"quizzes" gorm:"type:text"`
-	// VideoURL string? maybe not, just parse medias for the .mp4 formats?
+	Title      string         `json:"title" gorm:"unique;not null;default:null"`
+	Order      int            `json:"order" gorm:"not null;default:null;uniqueIndex:idx_course_order"`
+	CourseID   uint           `json:"courseId" gorm:"not null;default:null;uniqueIndex:idx_course_order"`
+	Course     Course         `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Summary    string         `json:"summary" gorm:"not null;default:null"`
+	ContentIds datatypes.JSON `json:"mediaIds" gorm:"default:null;type:text[]"`
+	Content    []Media        `json:"content" gorm:"foreignKey:ContentIds;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;-"`
+	Quizzes    []Quiz         `json:"quizzes" gorm:"default:null;-"`
+}
+
+type UpdateLesson struct {
+	Title      string `json:"title"`
+	Order      int    `json:"order"`
+	CourseID   uint   `json:"courseId"`
+	Summary    string `json:"summary"`
+	ContentIds []uint `json:"mediaIds"`
+}
+
+type AddContentsToLesson struct {
+	ContentIDs []uint `json:"contentIds"`
 }
