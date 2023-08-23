@@ -8,3 +8,8 @@ type Progress struct {
 	Completed    bool    `json:"completed" gorm:"not null;default:false"`
 	Progress     float64 `json:"progress" gorm:"not null;default:0"`
 }
+
+type UpdateProgress struct {
+	Completed bool    `json:"completed"`
+	Progress  float64 `json:"progress"`
+}
