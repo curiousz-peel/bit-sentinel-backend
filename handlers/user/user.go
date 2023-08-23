@@ -1,85 +1,99 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
-	"time"
 
-	"github.com/curiousz-peel/web-learning-platform-backend/handlers"
-	subscriptionHandler "github.com/curiousz-peel/web-learning-platform-backend/handlers/subscription"
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
-	"github.com/curiousz-peel/web-learning-platform-backend/storage"
+	service "github.com/curiousz-peel/web-learning-platform-backend/service/user"
 	"github.com/gofiber/fiber/v2"
 )
 
 func GetUsers(ctx *fiber.Ctx) error {
-	return handlers.GetRecords(ctx, &[]models.User{})
+	users, err := service.GetUsers()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch users",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "users fetched successfully",
+		"data":    users})
 }
 
-// take User entity out of utils, clear mess. make automatic creation of basic subscription plan for user on user creation
 func CreateUser(ctx *fiber.Ctx) error {
 	user := &models.User{}
 	err := ctx.BodyParser(user)
 	if err != nil {
-		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
-			"message": "request failed",
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
+			"message": "failed to parse request body",
 			"data":    err})
-		return err
 	}
-
-	err = storage.DB.Create(user).Error
+	user, err = service.CreateUser(user)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create user",
-			"data":    err})
-		return err
+			"data":    err.Error()})
 	}
-
-	//create Basic subscription when a new user registers
-	basicSubscription := map[string]interface{}{
-		"EndDate":        time.Now().AddDate(1000, 0, 0),
-		"SubscriptionID": 1,
-		"UserID":         user.ID}
-
-	basicSubscriptionJSON, err := json.Marshal(basicSubscription)
-	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "user was created, but Basic subscription plan failed to be parsed",
-			"data":    err})
-		return err
-	}
-
-	ctx.Context().Request.ResetBody()
-	ctx.Context().Request.SetBodyString(string(basicSubscriptionJSON))
-	err = subscriptionHandler.CreateSubscriptionPlans(ctx)
-	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "user was created, but creation of Basic subscription failed",
-			"data":    err})
-		return err
-	}
-
-	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "create user succeeded",
 		"data":    user})
-	return nil
 }
 
 func GetUserByID(ctx *fiber.Ctx) error {
-	return handlers.GetRecordByID(ctx, &models.User{}, "userId")
+	id := ctx.Params("userId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "user ID cannot be empty on get",
+			"data":    nil})
+	}
+	user, err := service.GetUserByID(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the user, check if ID " + id + " exists",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "user fetched successfully",
+		"data":    user})
 }
 
 func DeleteUserByID(ctx *fiber.Ctx) error {
-	return handlers.DeleteRecordByID(ctx, &models.User{}, "userId")
+	id := ctx.Params("userId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "user ID cannot be empty on delete",
+			"data":    nil})
+	}
+	err := service.DeleteUserByID(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not delete user, check if user with ID " + id + " exists",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "user deleted successfully"})
 }
 
 func UpdateUserByID(ctx *fiber.Ctx) error {
-	type updateUser struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Email     string `json:"email"`
-		Password  string `json:"password"`
-		IsAuthor  string `json:"isAuthor"`
+	id := ctx.Params("userId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "user ID cannot be empty on update",
+			"data":    nil})
 	}
-	return handlers.UpdateRecordByID(ctx, &models.User{}, &updateUser{}, "userId")
+	var updateUserData models.UpdateUser
+	err := ctx.BodyParser(&updateUserData)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "bad input: you can only update the first name, last name, user name, email, password, birthday, or is mod status",
+			"data":    err.Error()})
+	}
+	err = service.UpdateUserByID(id, updateUserData)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "could not update the user",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "user updated successfully",
+		"data":    nil})
 }
