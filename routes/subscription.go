@@ -22,3 +22,8 @@ func SetupSubscriptionPlanRoutes(router fiber.Router) {
 	subscriptionPlan.Put("/:subscriptionPlanId", subscriptionHandler.UpdateSubscriptionPlanByID)
 	subscriptionPlan.Delete("/:subscriptionPlanId", subscriptionHandler.DeleteSubscriptionPlanByID)
 }
+
+func SetupSubscriptionRelatedRoutes(router fiber.Router) {
+	SetupSubscriptionRoutes(router)
+	SetupSubscriptionPlanRoutes(router)
+}
