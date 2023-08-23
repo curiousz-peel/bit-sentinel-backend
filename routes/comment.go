@@ -6,10 +6,10 @@ import (
 )
 
 func SetupCommentRoutes(router fiber.Router) {
-	media := router.Group("/comment")
-	media.Post("/", commentHandler.CreateComment)
-	media.Get("/", commentHandler.GetComments)
-	media.Get("/:commentId", commentHandler.GetCommentByID)
-	media.Put("/:commentId", commentHandler.UpdateCommentByID)
-	media.Delete("/:commentId", commentHandler.DeleteCommentByID)
+	comment := router.Group("/comment")
+	comment.Post("/", commentHandler.CreateComment)
+	comment.Get("/", commentHandler.GetComments)
+	comment.Get("/:commentId", commentHandler.GetCommentByID)
+	comment.Put("/:commentId", commentHandler.UpdateCommentByID)
+	comment.Delete("/:commentId", commentHandler.DeleteCommentByID)
 }

@@ -8,9 +8,15 @@ import (
 type Enrollment struct {
 	gorm.Model
 	UserID     uuid.UUID `json:"userId" gorm:"uniqueIndex:idx_user_course;not null;default:null"`
-	User       User      `json:"user"`
+	User       User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	CourseID   uint      `json:"courseId" gorm:"uniqueIndex:idx_user_course;not null;default:null"`
-	Course     Course    `json:"course"`
-	ProgressID uint      `json:"progressId"`
-	Progress   Progress  `json:"progress"`
+	Course     Course    `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ProgressID uint      `json:"progressId" gorm:"default:null"`
+	Progress   Progress  `gorm:"foreignKey:ProgressID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+}
+
+type UpdateEnrollment struct {
+	UserID     uuid.UUID `json:"userID"`
+	CourseID   int       `json:"courseID"`
+	ProgressID int       `json:"progressID"`
 }

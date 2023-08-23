@@ -11,6 +11,7 @@ func SetupQuizRoutes(router fiber.Router) {
 	quiz.Get("/", quizHandler.GetQuizzes)
 	quiz.Get("/:quizId", quizHandler.GetQuizByID)
 	quiz.Put("/:quizId", quizHandler.UpdateQuizByID)
+	quiz.Put("addQuestions/:quizId", quizHandler.AddQuestionsToQuiz)
 	quiz.Delete("/:quizId", quizHandler.DeleteQuizByID)
 }
 
