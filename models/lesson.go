@@ -9,7 +9,7 @@ type Lesson struct {
 	gorm.Model
 	Title      string         `json:"title" gorm:"unique;not null;default:null"`
 	Order      int            `json:"order" gorm:"not null;default:null;uniqueIndex:idx_course_order"`
-	CourseID   uint           `json:"courseId" gorm:"not null;default:null;uniqueIndex:idx_course_order"`
+	CourseID   uint           `json:"courseId" gorm:"not null;default:null;uniqueIndex:idx_course_order;index:type:btree"`
 	Course     Course         `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Summary    string         `json:"summary" gorm:"not null;default:null"`
 	ContentIds datatypes.JSON `json:"mediaIds" gorm:"default:null;type:text[]"`

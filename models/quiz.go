@@ -11,11 +11,10 @@ type Quiz struct {
 	Description string         `json:"description" gorm:"not null;default:null"`
 	QuestionIDs datatypes.JSON `json:"questionIDs" gorm:"default:null;type:text[]"`
 	Questions   []Question     `json:"questions" gorm:"foreignKey:QuestionIDs;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;-"`
-	//change courseID and lessonID to be mandatory after all CRUDS are created
-	CourseID uint   `json:"courseId" gorm:"default:null"`
-	Course   Course `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	LessonID uint   `json:"lessonId" gorm:"default:null"`
-	Lesson   Lesson `gorm:"foreignKey:LessonID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CourseID    uint           `json:"courseId" gorm:"not null;default:null"`
+	Course      Course         `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	LessonID    uint           `json:"lessonId" gorm:"not null;default:null"`
+	Lesson      Lesson         `gorm:"foreignKey:LessonID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type UpdateQuiz struct {

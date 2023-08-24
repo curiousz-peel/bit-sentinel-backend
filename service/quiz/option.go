@@ -66,7 +66,7 @@ func DeleteOptionByID(id string) error {
 	}
 	res := storage.DB.Unscoped().Delete(option, id)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not delete option with id " + id)
 	}
 	return nil
 }

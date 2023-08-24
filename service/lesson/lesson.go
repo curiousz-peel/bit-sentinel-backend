@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
-	courseService "github.com/curiousz-peel/web-learning-platform-backend/service/course"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
@@ -53,7 +52,7 @@ func GetLessonByID(id string) (*models.Lesson, error) {
 		}
 		res = storage.DB.Find(&lesson.Content, "id IN (?)", ids)
 		if res.Error != nil || res.RowsAffected == 0 {
-			return nil, err
+			return nil, errors.New("could not find medias for lesson " + fmt.Sprint(lesson.ID))
 		}
 	}
 	storage.DB.Model(&lesson).Updates(&models.Lesson{
@@ -77,26 +76,6 @@ func DeleteLessonByID(id string) error {
 		return errors.New("can't query lessons from courses with err: " + err.Error())
 	}
 
-	for _, course := range courses {
-		var ids []uint
-		err = json.Unmarshal(course.LessonsIDs, &ids)
-		if err != nil {
-			return errors.New("unmarshaling ids failed with error: " + err.Error())
-		}
-
-		idx := slices.Index(ids, uint(intId))
-		newLessonsIDs := slices.Delete(ids, idx, idx+1)
-
-		if len(newLessonsIDs) == 0 {
-			courseService.DeleteCourseByID(strconv.FormatUint(uint64(course.ID), 10))
-		} else {
-			updateCourseLessonsIDs := models.UpdateCourse{LessonsIDs: newLessonsIDs}
-			err = courseService.UpdateCourseByID(strconv.FormatUint(uint64(course.ID), 10), updateCourseLessonsIDs)
-			if err != nil {
-				return err
-			}
-		}
-	}
 	res := storage.DB.Unscoped().Delete(lesson, id)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return errors.New("could not delete lesson with id " + id)

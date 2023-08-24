@@ -21,7 +21,7 @@ func GetEnrollmentByID(id string) (*models.Enrollment, error) {
 	enrollment := &models.Enrollment{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Course").Preload("Progress").Find(enrollment)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return nil, res.Error
+		return nil, errors.New("can't find enrollment with id " + id)
 	}
 	return enrollment, nil
 }
@@ -30,7 +30,7 @@ func DeleteEnrollmentByID(id string) error {
 	enrollment := &models.Enrollment{}
 	res := storage.DB.Unscoped().Delete(enrollment, id)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not delete enrollment with id " + id)
 	}
 	return nil
 }
@@ -62,7 +62,7 @@ func UpdateEnrollmentByID(id string, updateEnrollment models.UpdateEnrollment) e
 	enrollment := &models.Enrollment{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Course").Preload("Progress").Find(enrollment)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not update enrollment with id " + id)
 	}
 	storage.DB.Model(&enrollment).Updates(&models.Enrollment{
 		ProgressID: uint(updateEnrollment.ProgressID),

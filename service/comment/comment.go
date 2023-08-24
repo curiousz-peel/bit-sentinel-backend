@@ -30,7 +30,7 @@ func DeleteCommentByID(id string) error {
 	comment := &models.Comment{}
 	res := storage.DB.Unscoped().Delete(comment, id)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not delete comment with id " + id)
 	}
 	return nil
 }

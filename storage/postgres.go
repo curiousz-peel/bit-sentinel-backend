@@ -31,21 +31,23 @@ func ConnectDb() {
 	}
 	log.Println("connected to the database successfully")
 	log.Println("starting migrations")
-	db.Debug().AutoMigrate(&models.User{},
+	db.AutoMigrate(&models.User{},
 		&models.Author{},
 		&models.Subscription{},
 		&models.SubscriptionPlan{},
+		&models.MediaType{},
 		&models.Media{},
 		&models.Comment{},
 		&models.Course{},
 		&models.Lesson{},
 		&models.Enrollment{},
-		&models.MediaType{},
 		&models.Option{},
 		&models.Progress{},
 		&models.Question{},
 		&models.Quiz{},
-		&models.Rating{})
+		&models.Rating{},
+		&models.Complex1{},
+		&models.Complex2{})
 
 	//pass the created db connection to the global DB variable
 	DB = db

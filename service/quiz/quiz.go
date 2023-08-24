@@ -27,7 +27,7 @@ func GetQuizzes() (*[]models.Quiz, error) {
 			if len(ids) > 0 {
 				res := storage.DB.Find(&quizzes[i].Questions, "id IN (?)", ids)
 				if res.Error != nil || res.RowsAffected == 0 {
-					return nil, res.Error
+					return nil, errors.New("can't load questions for quiz with id " + fmt.Sprint(quizzes[i].ID))
 				}
 				storage.DB.Model(&quizzes[i]).Updates(&models.Quiz{
 					Questions: quizzes[i].Questions})
@@ -51,7 +51,7 @@ func GetQuizByID(id string) (*models.Quiz, error) {
 		}
 		res = storage.DB.Find(&quiz.Questions, "id IN (?)", ids)
 		if res.Error != nil || res.RowsAffected == 0 {
-			return nil, err
+			return nil, errors.New("could not find questions for quiz " + fmt.Sprint(quiz.ID))
 		}
 		storage.DB.Model(&quiz).Updates(&models.Quiz{
 			Questions: quiz.Questions})
@@ -63,7 +63,7 @@ func DeleteQuizByID(id string) error {
 	quiz := &models.Quiz{}
 	res := storage.DB.Unscoped().Delete(quiz, id)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not delete quiz with id " + id)
 	}
 	return nil
 }

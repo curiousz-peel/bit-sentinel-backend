@@ -30,7 +30,7 @@ func DeleteMediaByID(id string) error {
 	media := &models.Media{}
 	res := storage.DB.Unscoped().Delete(media, id)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not delete media with id " + id)
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func UpdateMediaByID(id string, updateMedia models.UpdateMedia) error {
 	media := &models.Media{}
 	res := storage.DB.Where("id = ?", id).Preload("Lesson").Preload("FileType").Find(media)
 	if res.Error != nil || res.RowsAffected == 0 {
-		return res.Error
+		return errors.New("could not update media with id " + id)
 	}
 	storage.DB.Model(&media).Updates(&models.Media{
 		LessonID:     updateMedia.LessonID,

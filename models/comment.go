@@ -9,7 +9,7 @@ type Comment struct {
 	gorm.Model
 	UserID   uuid.UUID `json:"userId" gorm:"not null;default:null"`
 	User     User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	CourseID uint      `json:"courseId" gorm:"not nul;default:null"`
+	CourseID uint      `json:"courseId" gorm:"not nul;default:null;index:type:btree"`
 	Course   Course    `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Text     string    `json:"text" gorm:"not null;default:null"`
 }

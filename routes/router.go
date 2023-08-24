@@ -7,8 +7,14 @@ import (
 func SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	SetupUserRoutes(api)
-	SetupSubscriptionRoutes(api)
+	SetupSubscriptionRelatedRoutes(api)
 	SetupAuthorRoutes(api)
-	SetupSubscriptionPlanRoutes(api)
-	// SetupMediaRoutes(api)
+	SetupTestComplexRoutes(api)
+	SetupMediaRelatedRoutes(api)
+	SetupCommentRoutes(api)
+	SetupEnrollmentRoutes(api)
+	SetupQuizRelatedRoutes(api)
+	SetupRatingRoutes(api)
+	SetupProgressRoutes(api)
+	SetupLessonRoutes(api)
 }
