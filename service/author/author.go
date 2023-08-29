@@ -8,25 +8,27 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetAuthorByID(id string) (*models.Author, error) {
+func GetAuthorByID(id string) (*models.AuthorDTO, error) {
 	author := &models.Author{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Find(author)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("could not find author with id " + id)
 	}
-	return author, nil
+	authorDTO := models.ToAuthorDTO(*author)
+	return &authorDTO, nil
 }
 
 func DeleteAuthorByID(id string) error {
 	author := &models.Author{}
-	res := storage.DB.Unscoped().Delete(author, id)
+	res := storage.DB.Where("id = ?", id).Unscoped().Delete(&author)
+	// res := storage.DB.Unscoped().Delete(author, id)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return errors.New("could not delete author with id " + id)
 	}
 	return nil
 }
 
-func CreateAuthor(author *models.Author) (*models.Author, error) {
+func CreateAuthor(author *models.Author) (*models.AuthorDTO, error) {
 	res := storage.DB.Debug().Find(&author.User, "id = ?", author.UserID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding user: " + author.UserID.String())
@@ -35,11 +37,13 @@ func CreateAuthor(author *models.Author) (*models.Author, error) {
 	if err != nil {
 		return nil, err
 	}
-	res = storage.DB.Model(author.User).Update("isAuthor", true)
+	res = storage.DB.Model(author.User).Update("is_author", true)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("can't update author status for user with id " + author.UserID.String())
 	}
-	return author, nil
+
+	authorDTO := models.ToAuthorDTO(*author)
+	return &authorDTO, nil
 }
 
 func UpdateAuthorByID(id string, updateAuthor models.UpdateAuthor) error {
@@ -60,11 +64,15 @@ func UpdateAuthorByID(id string, updateAuthor models.UpdateAuthor) error {
 	return nil
 }
 
-func GetAuthors() (*[]models.Author, error) {
+func GetAuthors() (*[]models.AuthorDTO, error) {
 	authors := &[]models.Author{}
+	authorDTOs := []models.AuthorDTO{}
 	err := storage.DB.Model(&models.Author{}).Preload("User").Find(&authors).Error
 	if err != nil {
 		return nil, err
 	}
-	return authors, nil
+	for _, author := range *authors {
+		authorDTOs = append(authorDTOs, models.ToAuthorDTO(author))
+	}
+	return &authorDTOs, nil
 }

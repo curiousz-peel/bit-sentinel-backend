@@ -8,22 +8,28 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetEnrollments() (*[]models.Enrollment, error) {
+func GetEnrollments() (*[]models.EnrollmentDTO, error) {
 	enrollments := &[]models.Enrollment{}
+	enrollmentDTOs := []models.EnrollmentDTO{}
+
 	err := storage.DB.Model(&models.Enrollment{}).Preload("User").Preload("Course").Preload("Progress").Find(&enrollments).Error
 	if err != nil {
 		return nil, err
 	}
-	return enrollments, nil
+	for _, enrollment := range *enrollments {
+		enrollmentDTOs = append(enrollmentDTOs, models.ToEnrollmentDTO(enrollment))
+	}
+	return &enrollmentDTOs, nil
 }
 
-func GetEnrollmentByID(id string) (*models.Enrollment, error) {
+func GetEnrollmentByID(id string) (*models.EnrollmentDTO, error) {
 	enrollment := &models.Enrollment{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Course").Preload("Progress").Find(enrollment)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("can't find enrollment with id " + id)
 	}
-	return enrollment, nil
+	enrollmentDTO := models.ToEnrollmentDTO(*enrollment)
+	return &enrollmentDTO, nil
 }
 
 func DeleteEnrollmentByID(id string) error {
@@ -35,7 +41,7 @@ func DeleteEnrollmentByID(id string) error {
 	return nil
 }
 
-func CreateEnrollment(enrollment *models.Enrollment) (*models.Enrollment, error) {
+func CreateEnrollment(enrollment *models.Enrollment) (*models.EnrollmentDTO, error) {
 	res := storage.DB.Find(&enrollment.User, "id = ?", enrollment.UserID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding user: " + enrollment.UserID.String())
@@ -55,7 +61,8 @@ func CreateEnrollment(enrollment *models.Enrollment) (*models.Enrollment, error)
 	if err != nil {
 		return nil, err
 	}
-	return enrollment, nil
+	enrollmentDTO := models.ToEnrollmentDTO(*enrollment)
+	return &enrollmentDTO, nil
 }
 
 func UpdateEnrollmentByID(id string, updateEnrollment models.UpdateEnrollment) error {

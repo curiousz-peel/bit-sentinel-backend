@@ -11,36 +11,24 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetCourses() (*[]models.Course, error) {
+func GetCourses() (*[]models.CourseDTO, error) {
 	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
 	err := storage.DB.Find(&courses).Error
 	if err != nil {
 		return nil, err
 	}
-	for _, course := range courses {
-		if course.AuthorsIDs != nil {
-			var ids []uuid.UUID
-			err = json.Unmarshal(course.AuthorsIDs, &ids)
-			if err != nil {
-				return nil, err
-			}
-			if len(ids) > 0 {
-				res := storage.DB.Find(&course.Authors, "id IN (?)", ids)
-				if res.Error != nil || res.RowsAffected == 0 {
-					return nil, errors.New("can't load authors for course with id " + fmt.Sprint(course.ID))
-				}
-				storage.DB.Model(&course).Updates(&models.Course{
-					Authors: course.Authors})
-			}
-		}
-		storage.DB.Where("course_id = ?", course.ID).Find(&course.Lessons)
-		storage.DB.Where("course_id = ?", course.ID).Find(&course.Ratings)
-		storage.DB.Where("course_id = ?", course.ID).Find(&course.Comments)
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
 	}
-	return &courses, nil
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
 }
 
-func GetCourseByID(id string) (*models.Course, error) {
+func GetCourseByID(id string) (*models.CourseDTO, error) {
 	course := &models.Course{}
 	res := storage.DB.Where("id = ?", id).Find(course)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -62,7 +50,8 @@ func GetCourseByID(id string) (*models.Course, error) {
 	storage.DB.Where("course_id = ?", course.ID).Find(&course.Lessons)
 	storage.DB.Where("course_id = ?", course.ID).Find(&course.Ratings)
 	storage.DB.Where("course_id = ?", course.ID).Find(&course.Comments)
-	return course, nil
+	courseDTO := models.ToCourseDTO(*course)
+	return &courseDTO, nil
 }
 
 func DeleteCourseByID(id string) error {
@@ -141,7 +130,7 @@ func AddAuthorsToCourse(id string, addedAuthorsIDs models.AddAuthorsToCourse) er
 	return nil
 }
 
-func CreateCourse(course *models.Course) (*models.Course, error) {
+func CreateCourse(course *models.Course) (*models.CourseDTO, error) {
 	var authorsIds []uuid.UUID
 	err := json.Unmarshal(course.AuthorsIDs, &authorsIds)
 	if err != nil {
@@ -158,5 +147,67 @@ func CreateCourse(course *models.Course) (*models.Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	return course, nil
+	courseDTO := models.ToCourseDTO(*course)
+	return &courseDTO, nil
+}
+
+func GetCoursesByRatingForHome() (*[]models.Course, error) {
+	courses := []models.Course{}
+	err := storage.DB.Order("rating desc").Limit(3).Find(&courses).Error
+	if err != nil {
+		return nil, err
+	}
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
+	}
+	return &courses, nil
+}
+
+func GetCoursesByMostRecentForHome() (*[]models.Course, error) {
+	courses := []models.Course{}
+	err := storage.DB.Order("created_at desc").Limit(3).Find(&courses).Error
+	if err != nil {
+		return nil, err
+	}
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
+	}
+	return &courses, nil
+}
+
+func GetCoursesFundamentalsForHome() (*[]models.Course, error) {
+	courses := []models.Course{}
+	err := storage.DB.Limit(3).Find(&courses, "tags ? 'tag1'").Error
+	if err != nil {
+		return nil, err
+	}
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
+	}
+	return &courses, nil
+}
+
+func populateCourses(courses []models.Course) ([]models.Course, error) {
+	for i := range courses {
+		if courses[i].AuthorsIDs != nil {
+			var ids []uuid.UUID
+			err := json.Unmarshal(courses[i].AuthorsIDs, &ids)
+			if err != nil {
+				return nil, err
+			}
+			if len(ids) > 0 {
+				res := storage.DB.Find(&courses[i].Authors, "id IN (?)", ids)
+				if res.Error != nil || res.RowsAffected == 0 {
+					return nil, errors.New("can't load authors for course with id " + fmt.Sprint(courses[i].ID))
+				}
+			}
+		}
+		storage.DB.Where("course_id = ?", courses[i].ID).Find(&courses[i].Lessons)
+		storage.DB.Where("course_id = ?", courses[i].ID).Find(&courses[i].Ratings)
+		storage.DB.Where("course_id = ?", courses[i].ID).Find(&courses[i].Comments)
+	}
+	return courses, nil
 }

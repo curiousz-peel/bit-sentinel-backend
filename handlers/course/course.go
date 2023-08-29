@@ -66,7 +66,7 @@ func CreateCourse(ctx *fiber.Ctx) error {
 			"data":    err.Error()})
 		return err
 	}
-	course, err = service.CreateCourse(course)
+	courseDTO, err := service.CreateCourse(course)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create course",
@@ -74,7 +74,7 @@ func CreateCourse(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "course created successfully",
-		"data":    course})
+		"data":    courseDTO})
 }
 
 func UpdateCourseByID(ctx *fiber.Ctx) error {
@@ -131,4 +131,40 @@ func AddAuthorsToCourse(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "authors added to question successfully",
 		"data":    nil})
+}
+
+func GetCoursesByRatingForHome(ctx *fiber.Ctx) error {
+	courses, err := service.GetCoursesByRatingForHome()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch top 3 courses by rating",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "courses fetched successfully",
+		"data":    courses})
+}
+
+func GetCoursesByMostRecentForHome(ctx *fiber.Ctx) error {
+	courses, err := service.GetCoursesByMostRecentForHome()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch most recent 3 courses",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "courses fetched successfully",
+		"data":    courses})
+}
+
+func GetCoursesFundamentalsForHome(ctx *fiber.Ctx) error {
+	courses, err := service.GetCoursesFundamentalsForHome()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch first 3 fundamental courses",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "courses fetched successfully",
+		"data":    courses})
 }

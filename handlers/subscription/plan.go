@@ -29,7 +29,7 @@ func CreateSubscriptionPlans(ctx *fiber.Ctx) error {
 			"data":    err.Error()})
 	}
 
-	subscriptionPlan, err = service.CreateSubscriptionPlan(subscriptionPlan)
+	subscriptionPlanDTO, err := service.CreateSubscriptionPlan(subscriptionPlan)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create subscription plan",
@@ -37,7 +37,7 @@ func CreateSubscriptionPlans(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "subscription plan created successfully",
-		"data":    subscriptionPlan})
+		"data":    subscriptionPlanDTO})
 }
 
 func GetSubscriptionPlanByID(ctx *fiber.Ctx) error {

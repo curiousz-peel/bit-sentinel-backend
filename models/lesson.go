@@ -18,13 +18,33 @@ type Lesson struct {
 }
 
 type UpdateLesson struct {
-	Title      string `json:"title"`
-	Order      int    `json:"order"`
-	CourseID   uint   `json:"courseId"`
-	Summary    string `json:"summary"`
-	ContentIds []uint `json:"mediaIds"`
+	Title      string         `json:"title"`
+	Order      int            `json:"order"`
+	CourseID   uint           `json:"courseId"`
+	Summary    string         `json:"summary"`
+	ContentIds datatypes.JSON `json:"mediaIds"`
+}
+
+type LessonDTO struct {
+	ID         uint           `json:"id"`
+	Title      string         `json:"title"`
+	Order      int            `json:"order"`
+	CourseID   uint           `json:"courseId"`
+	Summary    string         `json:"summary"`
+	ContentIds datatypes.JSON `json:"mediaIds"`
 }
 
 type AddContentsToLesson struct {
 	ContentIDs []uint `json:"contentIds"`
+}
+
+func ToLessonDTO(lesson Lesson) LessonDTO {
+	return LessonDTO{
+		ID:         lesson.ID,
+		Title:      lesson.Title,
+		Order:      lesson.Order,
+		CourseID:   lesson.CourseID,
+		Summary:    lesson.Summary,
+		ContentIds: lesson.ContentIds,
+	}
 }

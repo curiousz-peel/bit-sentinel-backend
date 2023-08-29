@@ -19,3 +19,19 @@ type UpdateRating struct {
 	CourseID int       `json:"courseID"`
 	Rating   float64   `json:"rating"`
 }
+
+type RatingDTO struct {
+	ID       uint      `json:"id"`
+	UserID   uuid.UUID `json:"userID"`
+	CourseID uint      `json:"courseID"`
+	Rating   float64   `json:"rating"`
+}
+
+func ToRatingDTO(rating Rating) RatingDTO {
+	return RatingDTO{
+		ID:       rating.ID,
+		UserID:   rating.UserID,
+		CourseID: rating.CourseID,
+		Rating:   rating.Rating,
+	}
+}

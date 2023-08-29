@@ -64,7 +64,7 @@ func CreateRating(ctx *fiber.Ctx) error {
 			"message": "failed to parse request body",
 			"data":    err})
 	}
-	rating, err = service.CreateRating(rating)
+	ratingDTO, err := service.CreateRating(rating)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create rating",
@@ -72,7 +72,7 @@ func CreateRating(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "rating created successfully",
-		"data":    rating})
+		"data":    ratingDTO})
 }
 
 func UpdateRatingByID(ctx *fiber.Ctx) error {

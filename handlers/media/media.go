@@ -65,7 +65,7 @@ func CreateMedia(ctx *fiber.Ctx) error {
 			"data":    err})
 		return err
 	}
-	media, err = service.CreateMedia(media)
+	mediaDTO, err := service.CreateMedia(media)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create media",
@@ -73,7 +73,7 @@ func CreateMedia(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "media created successfully",
-		"data":    media})
+		"data":    mediaDTO})
 }
 
 func UpdateMediaByID(ctx *fiber.Ctx) error {

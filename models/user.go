@@ -36,6 +36,32 @@ type UpdateUser struct {
 	IsMod     bool      `json:"isModerator"`
 }
 
+type UserDTO struct {
+	ID        uuid.UUID `json:"id"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	UserName  string    `json:"userName" `
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	Birthday  time.Time `json:"birthday"`
+	IsMod     bool      `json:"isModerator"`
+	IsAuthor  bool      `json:"isAuthor"`
+}
+
+func ToUserDTO(user User) UserDTO {
+	return UserDTO{
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		UserName:  user.UserName,
+		Email:     user.Email,
+		Password:  user.Password,
+		Birthday:  user.Birthday,
+		IsMod:     user.IsMod,
+		IsAuthor:  user.IsAuthor,
+	}
+}
+
 func (u *User) isValid() (err error) {
 	err = validator.ValidatePassword(u.Password)
 	if err != nil {

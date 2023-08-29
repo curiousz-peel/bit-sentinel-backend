@@ -29,6 +29,22 @@ type UpdateMedia struct {
 	FileTypeName string `json:"fileTypeName"`
 }
 
+type MediaDTO struct {
+	ID           uint   `json:"id"`
+	LessonID     uint   `json:"lessonID"`
+	FilePath     string `json:"filePath"`
+	FileTypeName string `json:"fileTypeName"`
+}
+
 type UpdateMediaType struct {
 	Type string `json:"type"`
+}
+
+func ToMediaDTO(media Media) MediaDTO {
+	return MediaDTO{
+		ID:           media.ID,
+		LessonID:     media.LessonID,
+		FilePath:     media.FilePath,
+		FileTypeName: media.FileTypeName,
+	}
 }

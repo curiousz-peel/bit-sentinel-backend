@@ -66,7 +66,7 @@ func CreateQuestion(ctx *fiber.Ctx) error {
 			"data":    err.Error()})
 		return err
 	}
-	question, err = service.CreateQuestion(question)
+	questionDTO, err := service.CreateQuestion(question)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create question",
@@ -74,7 +74,7 @@ func CreateQuestion(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "question created successfully",
-		"data":    question})
+		"data":    questionDTO})
 }
 
 func UpdateQuestionByID(ctx *fiber.Ctx) error {

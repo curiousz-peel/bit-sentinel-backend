@@ -64,13 +64,14 @@ func CreateEnrollment(ctx *fiber.Ctx) error {
 			"data":    err})
 	}
 
-	enrollment, err = service.CreateEnrollment(enrollment)
+	enrollmentDTO, err := service.CreateEnrollment(enrollment)
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to create enrollment",
 			"data":    err})
 	}
-	return ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "enrollment created successfully"})
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "enrollment created successfully",
+		"data": enrollmentDTO})
 }
 
 func UpdateEnrollmentByID(ctx *fiber.Ctx) error {

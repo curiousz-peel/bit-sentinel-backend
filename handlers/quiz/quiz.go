@@ -66,7 +66,7 @@ func CreateQuiz(ctx *fiber.Ctx) error {
 			"data":    err})
 		return err
 	}
-	quiz, err = service.CreateQuiz(quiz)
+	quizDTO, err := service.CreateQuiz(quiz)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create quiz",
@@ -74,7 +74,7 @@ func CreateQuiz(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "quiz created successfully",
-		"data":    quiz})
+		"data":    quizDTO})
 }
 
 func UpdateQuizByID(ctx *fiber.Ctx) error {

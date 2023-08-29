@@ -64,19 +64,19 @@ func CreateComment(ctx *fiber.Ctx) error {
 		fmt.Println(err)
 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to parse request body",
-			"data":    err})
+			"data":    err.Error()})
 		return err
 	}
 
-	comment, err = service.CreateComment(comment)
+	commentResponse, err := service.CreateComment(comment)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create comment",
-			"data":    err})
+			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "comment created successfully",
-		"data":    comment})
+		"data":    commentResponse})
 }
 
 func UpdateCommentByID(ctx *fiber.Ctx) error {

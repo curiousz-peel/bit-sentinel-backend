@@ -68,7 +68,7 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	author, err = service.CreateAuthor(author)
+	authorResponse, err := service.CreateAuthor(author)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create author",
@@ -76,7 +76,7 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "author created successfully",
-		"data":    author})
+		"data":    authorResponse})
 }
 
 func UpdateAuthorByID(ctx *fiber.Ctx) error {

@@ -20,3 +20,19 @@ type UpdateEnrollment struct {
 	CourseID   int       `json:"courseID"`
 	ProgressID int       `json:"progressID"`
 }
+
+type EnrollmentDTO struct {
+	ID         uint      `json:"id"`
+	UserID     uuid.UUID `json:"userId"`
+	CourseID   uint      `json:"courseId"`
+	ProgressID uint      `json:"progressId"`
+}
+
+func ToEnrollmentDTO(enrollment Enrollment) EnrollmentDTO {
+	return EnrollmentDTO{
+		ID:         enrollment.ID,
+		UserID:     enrollment.UserID,
+		CourseID:   enrollment.CourseID,
+		ProgressID: enrollment.ProgressID,
+	}
+}

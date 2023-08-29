@@ -11,22 +11,27 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetOptions() (*[]models.Option, error) {
+func GetOptions() (*[]models.OptionDTO, error) {
 	options := &[]models.Option{}
+	optionDTOs := []models.OptionDTO{}
 	err := storage.DB.Model(&models.Option{}).Preload("Question").Find(&options).Error
 	if err != nil {
 		return nil, err
 	}
-	return options, nil
+	for _, option := range *options {
+		optionDTOs = append(optionDTOs, models.ToOptionDTO(option))
+	}
+	return &optionDTOs, nil
 }
 
-func GetOptionByID(id string) (*models.Option, error) {
+func GetOptionByID(id string) (*models.OptionDTO, error) {
 	option := &models.Option{}
 	res := storage.DB.Where("id = ?", id).Preload("Question.Quiz").Find(option)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("couldn't find option with id " + id)
 	}
-	return option, nil
+	optionDTO := models.ToOptionDTO(*option)
+	return &optionDTO, nil
 }
 
 func DeleteOptionByID(id string) error {
@@ -71,7 +76,7 @@ func DeleteOptionByID(id string) error {
 	return nil
 }
 
-func CreateOption(option *models.Option) (*models.DisplayOption, error) {
+func CreateOption(option *models.Option) (*models.OptionDTO, error) {
 	res := storage.DB.Find(&option.Question, "id = ?", option.QuestionID)
 	if res.Error != nil {
 		return nil, errors.New("error in finding question: " + fmt.Sprint(option.QuestionID))
@@ -81,7 +86,7 @@ func CreateOption(option *models.Option) (*models.DisplayOption, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &models.DisplayOption{ID: option.ID, QuestionID: option.QuestionID, IsCorrect: option.IsCorrect, Text: option.Text}, nil
+	return &models.OptionDTO{ID: option.ID, QuestionID: option.QuestionID, IsCorrect: option.IsCorrect, Text: option.Text}, nil
 }
 
 func UpdateOptionByID(id string, updateOption models.UpdateOption) error {

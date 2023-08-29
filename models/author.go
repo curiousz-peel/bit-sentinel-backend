@@ -17,13 +17,35 @@ type Author struct {
 }
 
 type UpdateAuthor struct {
-	UserID      uuid.UUID `json:"userId"`
-	Profession  string    `json:"profession"`
-	Description string    `json:"description"`
-	Topics      []string  `json:"topics"`
+	UserID      uuid.UUID      `json:"userId"`
+	Profession  string         `json:"profession"`
+	Description string         `json:"description"`
+	Topics      datatypes.JSON `json:"topics"`
+}
+
+type AuthorDTO struct {
+	ID          uuid.UUID      `gorm:"type:uuid;primaryKey"`
+	UserID      uuid.UUID      `json:"userId"`
+	Profession  string         `json:"profession"`
+	Description string         `json:"description"`
+	Topics      datatypes.JSON `json:"topics"`
+	FirstName   string         `json:"firstName"`
+	LastName    string         `json:"lastName"`
 }
 
 func (a *Author) BeforeCreate(tx *gorm.DB) (err error) {
 	a.ID = uuid.New()
 	return
+}
+
+func ToAuthorDTO(author Author) AuthorDTO {
+	return AuthorDTO{
+		ID:          author.ID,
+		UserID:      author.UserID,
+		Profession:  author.Profession,
+		Description: author.Description,
+		Topics:      author.Topics,
+		FirstName:   author.User.FirstName,
+		LastName:    author.User.LastName,
+	}
 }

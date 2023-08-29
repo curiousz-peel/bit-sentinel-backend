@@ -25,6 +25,26 @@ type UpdateQuiz struct {
 	LessonID    uint   `json:"lessonId"`
 }
 
+type QuizDTO struct {
+	ID          uint           `json:"id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	QuestionIDs datatypes.JSON `json:"questionIDs"`
+	CourseID    uint           `json:"courseId"`
+	LessonID    uint           `json:"lessonId"`
+}
+
+func ToQuizDTO(quiz Quiz) QuizDTO {
+	return QuizDTO{
+		ID:          quiz.ID,
+		Title:       quiz.Title,
+		Description: quiz.Description,
+		QuestionIDs: quiz.QuestionIDs,
+		CourseID:    quiz.CourseID,
+		LessonID:    quiz.LessonID,
+	}
+}
+
 type AddQuestionsToQuiz struct {
 	QuestionIDs []uint `json:"questionIds"`
 }
@@ -42,6 +62,22 @@ type UpdateQuestion struct {
 	Text      string `json:"text"`
 	OptionIDs []uint `json:"optionIds"`
 	QuizID    uint   `json:"quizId"`
+}
+
+type QuestionDTO struct {
+	ID        uint           `json:"id"`
+	Text      string         `json:"text"`
+	OptionIDs datatypes.JSON `json:"optionIds"`
+	QuizID    uint           `json:"quizId"`
+}
+
+func ToQuestionDTO(question Question) QuestionDTO {
+	return QuestionDTO{
+		ID:        question.ID,
+		Text:      question.Text,
+		OptionIDs: question.OptionIDs,
+		QuizID:    question.QuizID,
+	}
 }
 
 type AddOptionsToQuestion struct {
@@ -62,9 +98,18 @@ type UpdateOption struct {
 	Text       string `json:"text"`
 }
 
-type DisplayOption struct {
+type OptionDTO struct {
 	ID         uint   `json:"ID"`
 	QuestionID uint   `json:"questionID"`
 	IsCorrect  bool   `json:"isCorrect"`
 	Text       string `json:"text"`
+}
+
+func ToOptionDTO(option Option) OptionDTO {
+	return OptionDTO{
+		ID:         option.ID,
+		QuestionID: option.QuestionID,
+		IsCorrect:  option.IsCorrect,
+		Text:       option.Text,
+	}
 }

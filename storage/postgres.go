@@ -45,9 +45,7 @@ func ConnectDb() {
 		&models.Progress{},
 		&models.Question{},
 		&models.Quiz{},
-		&models.Rating{},
-		&models.Complex1{},
-		&models.Complex2{})
+		&models.Rating{})
 
 	//pass the created db connection to the global DB variable
 	DB = db

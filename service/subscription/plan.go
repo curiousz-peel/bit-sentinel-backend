@@ -9,16 +9,20 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetSubscriptionPlans() (*[]models.SubscriptionPlan, error) {
+func GetSubscriptionPlans() (*[]models.SubscriptionPlanDTO, error) {
 	subscriptionPlans := &[]models.SubscriptionPlan{}
+	subscriptionPlansDTOs := []models.SubscriptionPlanDTO{}
 	err := storage.DB.Model(&models.SubscriptionPlan{}).Preload("User").Preload("Subscription").Find(&subscriptionPlans).Error
 	if err != nil {
 		return nil, err
 	}
-	return subscriptionPlans, nil
+	for _, subscriptionPlan := range *subscriptionPlans {
+		subscriptionPlansDTOs = append(subscriptionPlansDTOs, models.ToSubscriptionPlanDTO(subscriptionPlan))
+	}
+	return &subscriptionPlansDTOs, nil
 }
 
-func CreateSubscriptionPlan(subscriptionPlan *models.SubscriptionPlan) (*models.SubscriptionPlan, error) {
+func CreateSubscriptionPlan(subscriptionPlan *models.SubscriptionPlan) (*models.SubscriptionPlanDTO, error) {
 	res := storage.DB.Debug().Find(&subscriptionPlan.User, "id = ?", subscriptionPlan.UserID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding user: " + subscriptionPlan.UserID.String())
@@ -35,7 +39,8 @@ func CreateSubscriptionPlan(subscriptionPlan *models.SubscriptionPlan) (*models.
 	if err != nil {
 		return nil, err
 	}
-	return subscriptionPlan, nil
+	subscriptionPlanDTO := models.ToSubscriptionPlanDTO(*subscriptionPlan)
+	return &subscriptionPlanDTO, nil
 }
 
 func GetSubscriptionPlanByID(id string) (*models.SubscriptionPlan, error) {

@@ -8,22 +8,27 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetRatings() (*[]models.Rating, error) {
+func GetRatings() (*[]models.RatingDTO, error) {
 	ratings := &[]models.Rating{}
+	ratingsDTOs := []models.RatingDTO{}
 	err := storage.DB.Model(&models.Rating{}).Preload("User").Preload("Course").Find(&ratings).Error
 	if err != nil {
 		return nil, err
 	}
-	return ratings, nil
+	for _, rating := range *ratings {
+		ratingsDTOs = append(ratingsDTOs, models.ToRatingDTO(rating))
+	}
+	return &ratingsDTOs, nil
 }
 
-func GetRatingByID(id string) (*models.Rating, error) {
+func GetRatingByID(id string) (*models.RatingDTO, error) {
 	rating := &models.Rating{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Course").Find(rating)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("could not find rating with id " + id)
 	}
-	return rating, nil
+	ratingDTO := models.ToRatingDTO(*rating)
+	return &ratingDTO, nil
 }
 
 func DeleteRatingByID(id string) error {
@@ -35,24 +40,23 @@ func DeleteRatingByID(id string) error {
 	return nil
 }
 
-func CreateRating(rating *models.Rating) (*models.Rating, error) {
+func CreateRating(rating *models.Rating) (*models.RatingDTO, error) {
 	res := storage.DB.Debug().Find(&rating.User, "id = ?", rating.UserID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding user: " + rating.UserID.String())
 	}
-
 	if rating.CourseID != 0 {
 		res = storage.DB.Find(&rating.Course, "id = ?", rating.CourseID)
 		if res.Error != nil || res.RowsAffected == 0 {
 			return nil, errors.New("error in finding course: " + fmt.Sprint(rating.CourseID))
 		}
 	}
-
 	err := storage.DB.Debug().Omit("User").Create(rating).Error
 	if err != nil {
 		return nil, err
 	}
-	return rating, nil
+	ratingDTO := models.ToRatingDTO(*rating)
+	return &ratingDTO, nil
 }
 
 func UpdateRatingByID(id string, updateRating models.UpdateRating) error {

@@ -11,34 +11,24 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetLessons() (*[]models.Lesson, error) {
+func GetLessons() ([]models.LessonDTO, error) {
 	lessons := []models.Lesson{}
+	lessonDTOs := []models.LessonDTO{}
 	err := storage.DB.Preload("Course").Find(&lessons).Error
 	if err != nil {
 		return nil, err
 	}
-	for _, lesson := range lessons {
-		if lesson.ContentIds != nil {
-			var ids []uint
-			err = json.Unmarshal(lesson.ContentIds, &ids)
-			if err != nil {
-				return nil, err
-			}
-			if len(ids) > 0 {
-				res := storage.DB.Find(&lesson.Content, "id IN (?)", ids)
-				if res.Error != nil || res.RowsAffected == 0 {
-					return nil, errors.New("can't load medias for lesson with id " + fmt.Sprint(lesson.ID))
-				}
-				storage.DB.Model(&lesson).Updates(&models.Lesson{
-					Content: lesson.Content})
-			}
-		}
-		storage.DB.Where("lesson_id = ?", lesson.ID).Find(&lesson.Quizzes)
+	lessons, err = populateLessonss(lessons)
+	if err != nil {
+		return nil, err
 	}
-	return &lessons, nil
+	for _, lesson := range lessons {
+		lessonDTOs = append(lessonDTOs, models.ToLessonDTO(lesson))
+	}
+	return lessonDTOs, nil
 }
 
-func GetLessonByID(id string) (*models.Lesson, error) {
+func GetLessonByID(id string) (*models.LessonDTO, error) {
 	lesson := &models.Lesson{}
 	res := storage.DB.Preload("Course").Where("id = ?", id).Find(lesson)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -58,7 +48,8 @@ func GetLessonByID(id string) (*models.Lesson, error) {
 	storage.DB.Model(&lesson).Updates(&models.Lesson{
 		Content: lesson.Content})
 	storage.DB.Where("lesson_id = ?", lesson.ID).Find(&lesson.Quizzes)
-	return lesson, nil
+	lessonDTO := models.ToLessonDTO(*lesson)
+	return &lessonDTO, nil
 }
 
 func DeleteLessonByID(id string) error {
@@ -150,7 +141,7 @@ func AddContentsToLesson(id string, addedContentsIDs models.AddContentsToLesson)
 	return nil
 }
 
-func CreateLesson(lesson *models.Lesson) (*models.Lesson, error) {
+func CreateLesson(lesson *models.Lesson) (*models.LessonDTO, error) {
 	res := storage.DB.Model(models.Course{}).Find(&lesson.Course, "id = ?", lesson.CourseID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding course with id " + fmt.Sprint(lesson.CourseID) + " when creating lesson")
@@ -159,5 +150,26 @@ func CreateLesson(lesson *models.Lesson) (*models.Lesson, error) {
 	if err != nil {
 		return nil, err
 	}
-	return lesson, nil
+	lessonDTO := models.ToLessonDTO(*lesson)
+	return &lessonDTO, nil
+}
+
+func populateLessonss(lessons []models.Lesson) ([]models.Lesson, error) {
+	for i := range lessons {
+		if lessons[i].ContentIds != nil {
+			var ids []uint
+			err := json.Unmarshal(lessons[i].ContentIds, &ids)
+			if err != nil {
+				return nil, err
+			}
+			if len(ids) > 0 {
+				res := storage.DB.Find(&lessons[i].Content, "id IN (?)", ids)
+				if res.Error != nil || res.RowsAffected == 0 {
+					return nil, errors.New("can't load medias for lesson with id " + fmt.Sprint(lessons[i].ID))
+				}
+			}
+		}
+		storage.DB.Where("lesson_id = ?", lessons[i].ID).Find(&lessons[i].Quizzes)
+	}
+	return lessons, nil
 }

@@ -11,8 +11,9 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetQuestions() (*[]models.Question, error) {
+func GetQuestions() ([]models.QuestionDTO, error) {
 	questions := []models.Question{}
+	questionDTOs := []models.QuestionDTO{}
 	err := storage.DB.Preload("Quiz").Find(&questions).Error
 	if err != nil {
 		return nil, err
@@ -34,10 +35,14 @@ func GetQuestions() (*[]models.Question, error) {
 			}
 		}
 	}
-	return &questions, nil
+
+	for _, question := range questions {
+		questionDTOs = append(questionDTOs, models.ToQuestionDTO(question))
+	}
+	return questionDTOs, nil
 }
 
-func GetQuestionByID(id string) (*models.Question, error) {
+func GetQuestionByID(id string) (*models.QuestionDTO, error) {
 	question := &models.Question{}
 	res := storage.DB.Preload("Quiz").Where("id = ?", id).Find(question)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -56,7 +61,9 @@ func GetQuestionByID(id string) (*models.Question, error) {
 	}
 	storage.DB.Model(&question).Updates(&models.Question{
 		Options: question.Options})
-	return question, nil
+
+	questionDTO := models.ToQuestionDTO(*question)
+	return &questionDTO, nil
 }
 
 func DeleteQuestionByID(id string) error {
@@ -168,7 +175,7 @@ func AddOptionsToQuestion(id string, addedOptionsIDs models.AddOptionsToQuestion
 	return nil
 }
 
-func CreateQuestion(question *models.Question) (*models.Question, error) {
+func CreateQuestion(question *models.Question) (*models.QuestionDTO, error) {
 	res := storage.DB.Model(models.Quiz{}).Find(&question.Quiz, "id = ?", question.QuizID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("error in finding quiz with id " + fmt.Sprint(question.QuizID) + " when creating question")
@@ -177,5 +184,6 @@ func CreateQuestion(question *models.Question) (*models.Question, error) {
 	if err != nil {
 		return nil, err
 	}
-	return question, nil
+	questionDTO := models.ToQuestionDTO(*question)
+	return &questionDTO, nil
 }

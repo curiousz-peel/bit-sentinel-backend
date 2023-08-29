@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
@@ -10,7 +9,7 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func CreateUser(user *models.User) (*models.User, error) {
+func CreateUser(user *models.User) (*models.UserDTO, error) {
 	err := storage.DB.Create(user).Error
 	if err != nil {
 		return nil, err
@@ -19,7 +18,8 @@ func CreateUser(user *models.User) (*models.User, error) {
 	if err != nil {
 		return nil, errors.New("failed to create basic subscription plan for new user with id " + user.ID.String())
 	}
-	return user, nil
+	userDTO := models.ToUserDTO(*user)
+	return &userDTO, nil
 }
 
 func UpdateUserByID(id string, updateUser models.UpdateUser) error {
@@ -39,22 +39,24 @@ func UpdateUserByID(id string, updateUser models.UpdateUser) error {
 	return nil
 }
 
-func GetUsers() (*[]models.User, error) {
+func GetUsers() (*[]models.UserDTO, error) {
 	users := []models.User{}
+	usersDTOs := []models.UserDTO{}
 	err := storage.DB.Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
-	for _, user := range users {
-		storage.DB.Where("user_id = ?", user.ID).Find(&user.Ratings)
-		storage.DB.Where("user_id = ?", user.ID).Find(&user.Enrollments)
-		storage.DB.Where("user_id = ?", user.ID).Find(&user.Comments)
-		fmt.Println(user)
+	for i := range users {
+		storage.DB.Where("user_id = ?", users[i].ID).Find(&users[i].Ratings)
+		storage.DB.Where("user_id = ?", users[i].ID).Find(&users[i].Enrollments)
+		storage.DB.Where("user_id = ?", users[i].ID).Find(&users[i].Comments)
+
+		usersDTOs = append(usersDTOs, models.ToUserDTO(users[i]))
 	}
-	return &users, nil
+	return &usersDTOs, nil
 }
 
-func GetUserByID(id string) (*models.User, error) {
+func GetUserByID(id string) (*models.UserDTO, error) {
 	user := &models.User{}
 	res := storage.DB.Where("id = ?", id).Find(user)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -63,7 +65,8 @@ func GetUserByID(id string) (*models.User, error) {
 	storage.DB.Where("user_id = ?", user.ID).Find(&user.Ratings)
 	storage.DB.Where("user_id = ?", user.ID).Find(&user.Enrollments)
 	storage.DB.Where("user_id = ?", user.ID).Find(&user.Comments)
-	return user, nil
+	userDTO := models.ToUserDTO(*user)
+	return &userDTO, nil
 }
 
 func DeleteUserByID(id string) error {

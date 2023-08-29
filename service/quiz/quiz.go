@@ -10,13 +10,13 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
 )
 
-func GetQuizzes() (*[]models.Quiz, error) {
+func GetQuizzes() ([]models.QuizDTO, error) {
 	quizzes := []models.Quiz{}
+	quizzDTOs := []models.QuizDTO{}
 	err := storage.DB.Model(&models.Quiz{}).Preload("Course").Preload("Lesson").Find(&quizzes).Error
 	if err != nil {
 		return nil, err
 	}
-
 	for i := range quizzes {
 		if quizzes[i].QuestionIDs != nil {
 			var ids []uint
@@ -34,10 +34,13 @@ func GetQuizzes() (*[]models.Quiz, error) {
 			}
 		}
 	}
-	return &quizzes, nil
+	for _, quiz := range quizzes {
+		quizzDTOs = append(quizzDTOs, models.ToQuizDTO(quiz))
+	}
+	return quizzDTOs, nil
 }
 
-func GetQuizByID(id string) (*models.Quiz, error) {
+func GetQuizByID(id string) (*models.QuizDTO, error) {
 	quiz := &models.Quiz{}
 	res := storage.DB.Where("id = ?", id).Find(quiz)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -56,7 +59,8 @@ func GetQuizByID(id string) (*models.Quiz, error) {
 		storage.DB.Model(&quiz).Updates(&models.Quiz{
 			Questions: quiz.Questions})
 	}
-	return quiz, nil
+	quizDTO := models.ToQuizDTO(*quiz)
+	return &quizDTO, nil
 }
 
 func DeleteQuizByID(id string) error {
@@ -99,12 +103,13 @@ func UpdateQuizByID(id string, updateQuiz models.UpdateQuiz) error {
 	return nil
 }
 
-func CreateQuiz(quiz *models.Quiz) (*models.Quiz, error) {
+func CreateQuiz(quiz *models.Quiz) (*models.QuizDTO, error) {
 	err := storage.DB.Create(quiz).Error
 	if err != nil {
 		return nil, err
 	}
-	return quiz, nil
+	quizDTO := models.ToQuizDTO(*quiz)
+	return &quizDTO, nil
 }
 
 func AddQuestionsToQuiz(id string, addedQuestionsIDs models.AddQuestionsToQuiz) error {

@@ -28,7 +28,7 @@ func CreateUser(ctx *fiber.Ctx) error {
 			"message": "failed to parse request body",
 			"data":    err})
 	}
-	user, err = service.CreateUser(user)
+	userDTO, err := service.CreateUser(user)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create user",
@@ -36,7 +36,7 @@ func CreateUser(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "create user succeeded",
-		"data":    user})
+		"data":    userDTO})
 }
 
 func GetUserByID(ctx *fiber.Ctx) error {

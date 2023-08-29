@@ -66,7 +66,7 @@ func CreateLesson(ctx *fiber.Ctx) error {
 			"data":    err.Error()})
 		return err
 	}
-	lesson, err = service.CreateLesson(lesson)
+	lessonDTO, err := service.CreateLesson(lesson)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create lesson",
@@ -74,7 +74,7 @@ func CreateLesson(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "lesson created successfully",
-		"data":    lesson})
+		"data":    lessonDTO})
 }
 
 func UpdateLessonByID(ctx *fiber.Ctx) error {

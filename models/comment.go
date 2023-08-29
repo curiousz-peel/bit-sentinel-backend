@@ -19,3 +19,19 @@ type UpdateComment struct {
 	CourseID int       `json:"courseID"`
 	Text     string    `json:"text"`
 }
+
+type CommentDTO struct {
+	ID       uint      `json:"id"`
+	UserID   uuid.UUID `json:"userId"`
+	CourseID uint
+	Text     string
+}
+
+func ToCommentDTO(comment Comment) CommentDTO {
+	return CommentDTO{
+		ID:       comment.ID,
+		UserID:   comment.User.ID,
+		CourseID: comment.CourseID,
+		Text:     comment.Text,
+	}
+}
