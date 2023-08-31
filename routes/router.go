@@ -17,4 +17,5 @@ func SetupRoutes(app *fiber.App) {
 	SetupProgressRoutes(api)
 	SetupLessonRoutes(api)
 	SetupCourseRoutes(api)
+	SetupAuthRoutes(api)
 }

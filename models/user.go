@@ -36,6 +36,11 @@ type UpdateUser struct {
 	IsMod     bool      `json:"isModerator"`
 }
 
+type LoginUser struct {
+	UserName string `json:"user"`
+	Password string `json:"pass"`
+}
+
 type UserDTO struct {
 	ID        uuid.UUID `json:"id"`
 	FirstName string    `json:"firstName"`

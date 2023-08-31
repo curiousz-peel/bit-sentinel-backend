@@ -69,6 +69,19 @@ func GetUserByID(id string) (*models.UserDTO, error) {
 	return &userDTO, nil
 }
 
+func GetUserByUsername(userName string) (*models.UserDTO, error) {
+	user := &models.User{}
+	res := storage.DB.Where("user_name = ?", userName).Find(user)
+	if res.Error != nil || res.RowsAffected == 0 {
+		return nil, errors.New("can't find user with username " + userName)
+	}
+	storage.DB.Where("user_id = ?", user.ID).Find(&user.Ratings)
+	storage.DB.Where("user_id = ?", user.ID).Find(&user.Enrollments)
+	storage.DB.Where("user_id = ?", user.ID).Find(&user.Comments)
+	userDTO := models.ToUserDTO(*user)
+	return &userDTO, nil
+}
+
 func DeleteUserByID(id string) error {
 	user := &models.User{}
 	res := storage.DB.Unscoped().Delete(user, id)

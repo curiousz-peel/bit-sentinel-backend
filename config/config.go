@@ -21,6 +21,10 @@ type EmailConfig struct {
 	Password string
 }
 
+type JWTConfig struct {
+	JWTSecret string
+}
+
 func InitDbConfig() (*DbConfig, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -47,6 +51,18 @@ func InitEmailConfig() (*EmailConfig, error) {
 	config := &EmailConfig{
 		Address:  os.Getenv("MAIL_ADDR"),
 		Password: os.Getenv("MAIL_PASS"),
+	}
+	return config, nil
+}
+
+func InitJWTConfig() (*JWTConfig, error) {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Print("error loading .env file")
+		return nil, err
+	}
+	config := &JWTConfig{
+		JWTSecret: os.Getenv("JWT_SECRET"),
 	}
 	return config, nil
 }
