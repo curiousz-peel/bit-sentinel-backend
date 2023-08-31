@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	jwtUtil "github.com/curiousz-peel/web-learning-platform-backend/jwt"
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
+	jwtUtil "github.com/curiousz-peel/web-learning-platform-backend/requestValidator"
 	service "github.com/curiousz-peel/web-learning-platform-backend/service/user"
 	"github.com/gofiber/fiber/v2"
 )
