@@ -30,20 +30,22 @@ type UpdateSubscriptionPlan struct {
 }
 
 type SubscriptionPlanDTO struct {
-	ID             uint      `json:"id"`
-	UserID         uuid.UUID `json:"userId"`
-	SubscriptionID uint      `json:"subscriptionId"`
-	StartDate      time.Time `json:"startDate"`
-	EndDate        time.Time `json:"endDate"`
+	ID               uint      `json:"id"`
+	UserID           uuid.UUID `json:"userId"`
+	SubscriptionID   uint      `json:"subscriptionId"`
+	SubscriptionType string    `json:"subscriptionType"`
+	StartDate        time.Time `json:"startDate"`
+	EndDate          time.Time `json:"endDate"`
 }
 
 func ToSubscriptionPlanDTO(subscriptionPlan SubscriptionPlan) SubscriptionPlanDTO {
 	return SubscriptionPlanDTO{
-		ID:             subscriptionPlan.ID,
-		UserID:         subscriptionPlan.UserID,
-		SubscriptionID: subscriptionPlan.SubscriptionID,
-		StartDate:      subscriptionPlan.StartDate,
-		EndDate:        subscriptionPlan.EndDate,
+		ID:               subscriptionPlan.ID,
+		UserID:           subscriptionPlan.UserID,
+		SubscriptionID:   subscriptionPlan.SubscriptionID,
+		StartDate:        subscriptionPlan.StartDate,
+		EndDate:          subscriptionPlan.EndDate,
+		SubscriptionType: subscriptionPlan.Subscription.Type,
 	}
 }
 

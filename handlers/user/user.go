@@ -57,6 +57,24 @@ func GetUserByID(ctx *fiber.Ctx) error {
 		"data":    user})
 }
 
+func GetUserByUserName(ctx *fiber.Ctx) error {
+	name := ctx.Params("userName")
+	if name == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "user name cannot be empty on get",
+			"data":    nil})
+	}
+	user, err := service.GetUserByUsername(name)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the user, check if name " + name + " exists",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "user fetched successfully",
+		"data":    user})
+}
+
 func DeleteUserByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("userId")
 	if id == "" {

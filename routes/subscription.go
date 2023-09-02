@@ -20,6 +20,7 @@ func SetupSubscriptionPlanRoutes(router fiber.Router) {
 	subscriptionPlan.Post("/", jwtHandler.ValidateToken, subscriptionHandler.CreateSubscriptionPlans)
 	subscriptionPlan.Get("/", jwtHandler.ValidateToken, subscriptionHandler.GetSubscriptionPlans)
 	subscriptionPlan.Get("/:subscriptionPlanId", jwtHandler.ValidateToken, subscriptionHandler.GetSubscriptionPlanByID)
+	subscriptionPlan.Get("/user/:userId", jwtHandler.ValidateToken, subscriptionHandler.GetSubscriptionPlanByUserId)
 	subscriptionPlan.Put("/:subscriptionPlanId", jwtHandler.ValidateToken, subscriptionHandler.UpdateSubscriptionPlanByID)
 	subscriptionPlan.Delete("/:subscriptionPlanId", jwtHandler.ValidateToken, subscriptionHandler.DeleteSubscriptionPlanByID)
 }

@@ -10,6 +10,7 @@ func SetupUserRoutes(router fiber.Router) {
 	user := router.Group("/user")
 	user.Post("/", jwtHandler.ValidateToken, userHandler.CreateUser)
 	user.Get("/", jwtHandler.ValidateToken, userHandler.GetUsers)
+	user.Get("/name/:userName", jwtHandler.ValidateToken, userHandler.GetUserByUserName)
 	user.Get("/:userId", jwtHandler.ValidateToken, userHandler.GetUserByID)
 	user.Put("/:userId", jwtHandler.ValidateToken, userHandler.UpdateUserByID)
 	user.Delete("/:userId", jwtHandler.ValidateToken, userHandler.DeleteUserByID)

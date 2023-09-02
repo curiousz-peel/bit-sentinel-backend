@@ -58,6 +58,19 @@ func GetSubscriptionPlanByID(ctx *fiber.Ctx) error {
 		"data":    subscriptionPlan})
 }
 
+func GetSubscriptionPlanByUserId(ctx *fiber.Ctx) error {
+	id := ctx.Params("userId")
+	subscriptionPlan, err := service.GetSubscriptionPlanByUserId(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch subscription plan by user id",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "subscription plan fetched successfully",
+		"data":    subscriptionPlan})
+}
+
 func DeleteSubscriptionPlanByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("subscriptionPlanId")
 	if id == "" {

@@ -43,13 +43,24 @@ func CreateSubscriptionPlan(subscriptionPlan *models.SubscriptionPlan) (*models.
 	return &subscriptionPlanDTO, nil
 }
 
-func GetSubscriptionPlanByID(id string) (*models.SubscriptionPlan, error) {
+func GetSubscriptionPlanByID(id string) (*models.SubscriptionPlanDTO, error) {
 	subscriptionPlan := &models.SubscriptionPlan{}
 	res := storage.DB.Where("id = ?", id).Preload("User").Preload("Subscription").Find(subscriptionPlan)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return nil, errors.New("could not find subscription plan with id " + id)
 	}
-	return subscriptionPlan, nil
+	subscriptionPlanDTO := models.ToSubscriptionPlanDTO(*subscriptionPlan)
+	return &subscriptionPlanDTO, nil
+}
+
+func GetSubscriptionPlanByUserId(id string) (*models.SubscriptionPlanDTO, error) {
+	subscriptionPlan := &models.SubscriptionPlan{}
+	res := storage.DB.Where("user_id = ?", id).Preload("User").Preload("Subscription").Find(subscriptionPlan)
+	if res.Error != nil || res.RowsAffected == 0 {
+		return nil, errors.New("could not find subscription plan with user id " + id)
+	}
+	subscriptionPlanDTO := models.ToSubscriptionPlanDTO(*subscriptionPlan)
+	return &subscriptionPlanDTO, nil
 }
 
 func DeleteSubscriptionPlanByID(id string) error {
