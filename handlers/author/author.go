@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
@@ -61,7 +60,6 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 	author := &models.Author{}
 	err := ctx.BodyParser(author)
 	if err != nil {
-		fmt.Println(err)
 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to parse request body",
 			"data":    err})

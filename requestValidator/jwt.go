@@ -35,9 +35,6 @@ func GetLoginToken(userName string) (string, error) {
 
 	tokenString, err := token.SignedString(JWTSecret)
 	if err != nil {
-		fmt.Printf("%T", JWTSecret)
-		fmt.Println(JWTSecret)
-		fmt.Print(err)
 		return "", errors.New("could not sign token string")
 	}
 

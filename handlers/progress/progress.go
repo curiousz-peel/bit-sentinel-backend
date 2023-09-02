@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
@@ -61,7 +60,6 @@ func CreateProgress(ctx *fiber.Ctx) error {
 	progress := &models.Progress{}
 	err := ctx.BodyParser(progress)
 	if err != nil {
-		fmt.Println(err)
 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to parse request body",
 			"data":    err})

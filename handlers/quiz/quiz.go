@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
@@ -60,7 +59,6 @@ func CreateQuiz(ctx *fiber.Ctx) error {
 	quiz := &models.Quiz{}
 	err := ctx.BodyParser(quiz)
 	if err != nil {
-		fmt.Println(err)
 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to parse request body",
 			"data":    err})

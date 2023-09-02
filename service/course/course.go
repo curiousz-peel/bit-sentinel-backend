@@ -151,8 +151,9 @@ func CreateCourse(course *models.Course) (*models.CourseDTO, error) {
 	return &courseDTO, nil
 }
 
-func GetCoursesByRatingForHome() (*[]models.Course, error) {
+func GetCoursesByRatingForHome() (*[]models.CourseDTO, error) {
 	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
 	err := storage.DB.Order("rating desc").Limit(3).Find(&courses).Error
 	if err != nil {
 		return nil, err
@@ -161,11 +162,15 @@ func GetCoursesByRatingForHome() (*[]models.Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &courses, nil
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
 }
 
-func GetCoursesByMostRecentForHome() (*[]models.Course, error) {
+func GetCoursesByMostRecentForHome() (*[]models.CourseDTO, error) {
 	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
 	err := storage.DB.Order("created_at desc").Limit(3).Find(&courses).Error
 	if err != nil {
 		return nil, err
@@ -174,11 +179,16 @@ func GetCoursesByMostRecentForHome() (*[]models.Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &courses, nil
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
 }
 
-func GetCoursesFundamentalsForHome() (*[]models.Course, error) {
+func GetCoursesFundamentalsForHome() (*[]models.CourseDTO, error) {
 	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
+	// err := storage.DB.Limit(3).Find(&courses, "included_subscriptions ? 'Basic'").Error
 	err := storage.DB.Limit(3).Find(&courses, "tags ? 'tag1'").Error
 	if err != nil {
 		return nil, err
@@ -187,7 +197,10 @@ func GetCoursesFundamentalsForHome() (*[]models.Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &courses, nil
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
 }
 
 func populateCourses(courses []models.Course) ([]models.Course, error) {

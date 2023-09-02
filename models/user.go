@@ -18,7 +18,7 @@ type User struct {
 	UserName    string       `json:"userName" gorm:"unique;not null;default:null"`
 	Email       string       `json:"email" gorm:"unique;not null;default:null"`
 	Password    string       `json:"password" gorm:"not null;default:null"`
-	Birthday    time.Time    `json:"birthday" gorm:"not null;default:null"`
+	Birthday    time.Time    `json:"birthday" gorm:"default:null"`
 	IsMod       bool         `json:"isModerator" gorm:"default:false"`
 	IsAuthor    bool         `json:"isAuthor" gorm:"default:false"`
 	Ratings     []Rating     `json:"ratings" gorm:"default:null;-"`

@@ -26,7 +26,7 @@ func Login(ctx *fiber.Ctx) error {
 	if user.Password != loginUser.Password {
 		return ctx.Status(http.StatusUnauthorized).JSON(&fiber.Map{
 			"message": "wrong username + password combination",
-			"data":    nil})
+			"data":    "wrong username + password combination"})
 	}
 	token, err := jwtUtil.GetLoginToken(loginUser.UserName)
 	if err != nil {

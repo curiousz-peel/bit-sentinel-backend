@@ -37,6 +37,7 @@ type CourseDTO struct {
 	Rating                float64        `json:"rating"`
 	RatingNo              int            `json:"ratingNo"`
 	IncludedSubscriptions datatypes.JSON `json:"subscriptions"`
+	AuthorsIDs            datatypes.JSON `json:"authorIds"`
 }
 
 type AddAuthorsToCourse struct {
@@ -52,5 +53,6 @@ func ToCourseDTO(course Course) CourseDTO {
 		Rating:                course.Rating,
 		RatingNo:              len(course.Ratings),
 		IncludedSubscriptions: course.IncludedSubscriptions,
+		AuthorsIDs:            course.AuthorsIDs,
 	}
 }

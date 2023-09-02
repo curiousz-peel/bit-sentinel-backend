@@ -16,7 +16,7 @@ func GetRatings(ctx *fiber.Ctx) error {
 			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "comments fetched successfully",
+		"message": "ratings fetched successfully",
 		"data":    ratings})
 
 }
@@ -36,6 +36,25 @@ func GetRatingByID(ctx *fiber.Ctx) error {
 	}
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "rating fetched successfully",
+		"data":    rating})
+	return nil
+}
+
+func GetRatingsByCourseID(ctx *fiber.Ctx) error {
+	id := ctx.Params("courseId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "course ID cannot be empty on get ratings by course ID",
+			"data":    nil})
+	}
+	rating, err := service.GetRatingsByCourseId(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "errors in fetching the ratings",
+			"data":    err.Error()})
+	}
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "ratings fetched successfully",
 		"data":    rating})
 	return nil
 }

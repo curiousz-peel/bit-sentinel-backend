@@ -11,6 +11,7 @@ func SetupRatingRoutes(router fiber.Router) {
 	rating.Post("/", jwtHandler.ValidateToken, ratingHandler.CreateRating)
 	rating.Get("/", jwtHandler.ValidateToken, ratingHandler.GetRatings)
 	rating.Get("/:ratingId", jwtHandler.ValidateToken, ratingHandler.GetRatingByID)
+	rating.Get("/course/:courseId", jwtHandler.ValidateToken, ratingHandler.GetRatingsByCourseID)
 	rating.Put("/:ratingId", jwtHandler.ValidateToken, ratingHandler.UpdateRatingByID)
 	rating.Delete("/:ratingId", jwtHandler.ValidateToken, ratingHandler.DeleteRatingByID)
 }

@@ -31,6 +31,19 @@ func GetRatingByID(id string) (*models.RatingDTO, error) {
 	return &ratingDTO, nil
 }
 
+func GetRatingsByCourseId(id string) (*[]models.RatingDTO, error) {
+	ratings := &[]models.Rating{}
+	ratingsDTOs := []models.RatingDTO{}
+	res := storage.DB.Where("course_id = ?", id).Preload("User").Preload("Course").Find(ratings)
+	if res.Error != nil {
+		return nil, errors.New("error in executing the sql for course with id " + id)
+	}
+	for _, rating := range *ratings {
+		ratingsDTOs = append(ratingsDTOs, models.ToRatingDTO(rating))
+	}
+	return &ratingsDTOs, nil
+}
+
 func DeleteRatingByID(id string) error {
 	rating := &models.Rating{}
 	res := storage.DB.Unscoped().Delete(rating, id)
