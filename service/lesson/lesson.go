@@ -28,6 +28,23 @@ func GetLessons() ([]models.LessonDTO, error) {
 	return lessonDTOs, nil
 }
 
+func GetLessonsByCourseId(courseId string) ([]models.LessonDTO, error) {
+	lessons := []models.Lesson{}
+	lessonDTOs := []models.LessonDTO{}
+	err := storage.DB.Preload("Course").Find(&lessons, "course_id = ?", courseId).Error
+	if err != nil {
+		return nil, err
+	}
+	lessons, err = populateLessonss(lessons)
+	if err != nil {
+		return nil, err
+	}
+	for _, lesson := range lessons {
+		lessonDTOs = append(lessonDTOs, models.ToLessonDTO(lesson))
+	}
+	return lessonDTOs, nil
+}
+
 func GetLessonByID(id string) (*models.LessonDTO, error) {
 	lesson := &models.Lesson{}
 	res := storage.DB.Preload("Course").Where("id = ?", id).Find(lesson)

@@ -9,6 +9,7 @@ import (
 type Course struct {
 	gorm.Model
 	Title                 string         `json:"title" gorm:"unique;not null;default:null"`
+	Description           string         `json:"description" gorm:"not null;default:null"`
 	AuthorsIDs            datatypes.JSON `json:"authorIds" gorm:"not null;default:null;type:text[]"`
 	Authors               []Author       `json:"authors" gorm:"foreignKey:AuthorsIDs;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;-"`
 	Lessons               []Lesson       `gorm:"foreignKey:LessonsIDs;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;-"`
@@ -22,6 +23,7 @@ type Course struct {
 
 type UpdateCourse struct {
 	Title                 string         `json:"title"`
+	Description           string         `json:"description"`
 	AuthorsIDs            datatypes.JSON `json:"authorIds"`
 	Tags                  datatypes.JSON `json:"tags"`
 	Visible               bool           `json:"visible"`
@@ -32,6 +34,7 @@ type UpdateCourse struct {
 type CourseDTO struct {
 	ID                    uint           `json:"id"`
 	Title                 string         `json:"title"`
+	Description           string         `json:"description"`
 	Tags                  datatypes.JSON `json:"tags"`
 	Visible               bool           `json:"visible"`
 	Rating                float64        `json:"rating"`
@@ -48,6 +51,7 @@ func ToCourseDTO(course Course) CourseDTO {
 	return CourseDTO{
 		ID:                    course.ID,
 		Title:                 course.Title,
+		Description:           course.Description,
 		Tags:                  course.Tags,
 		Visible:               course.Visible,
 		Rating:                course.Rating,

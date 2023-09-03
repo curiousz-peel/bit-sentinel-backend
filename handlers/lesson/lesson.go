@@ -20,6 +20,24 @@ func GetLessons(ctx *fiber.Ctx) error {
 		"data":    lessons})
 }
 
+func GetLessonsByCourseId(ctx *fiber.Ctx) error {
+	courseId := ctx.Params("courseId")
+	if courseId == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "course ID cannot be empty on get lessons",
+			"data":    nil})
+	}
+	lessons, err := service.GetLessonsByCourseId(courseId)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the lessons, check if course ID " + courseId + " exists",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "lesson sfetched successfully",
+		"data":    lessons})
+}
+
 func GetLessonByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("lessonId")
 	if id == "" {

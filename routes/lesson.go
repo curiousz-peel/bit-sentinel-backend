@@ -11,6 +11,7 @@ func SetupLessonRoutes(router fiber.Router) {
 	lesson.Post("/", jwtHandler.ValidateToken, lessonHandler.CreateLesson)
 	lesson.Get("/", jwtHandler.ValidateToken, lessonHandler.GetLessons)
 	lesson.Get("/:lessonId", jwtHandler.ValidateToken, lessonHandler.GetLessonByID)
+	lesson.Get("/course/:courseId", jwtHandler.ValidateToken, lessonHandler.GetLessonsByCourseId)
 	lesson.Put("/:lessonId", jwtHandler.ValidateToken, lessonHandler.UpdateLessonByID)
 	lesson.Delete("/:lessonId", jwtHandler.ValidateToken, lessonHandler.DeleteLessonByID)
 }
