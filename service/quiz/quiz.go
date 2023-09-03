@@ -40,6 +40,36 @@ func GetQuizzes() ([]models.QuizDTO, error) {
 	return quizzDTOs, nil
 }
 
+func GetQuizzesByCourseId(courseId string) ([]models.QuizDTO, error) {
+	quizzes := []models.Quiz{}
+	quizzDTOs := []models.QuizDTO{}
+	err := storage.DB.Model(&models.Quiz{}).Preload("Course").Preload("Lesson").Find(&quizzes, "course_id = ?", courseId).Error
+	if err != nil {
+		return nil, err
+	}
+	for i := range quizzes {
+		if quizzes[i].QuestionIDs != nil {
+			var ids []uint
+			err = json.Unmarshal(quizzes[i].QuestionIDs, &ids)
+			if err != nil {
+				return nil, err
+			}
+			if len(ids) > 0 {
+				res := storage.DB.Find(&quizzes[i].Questions, "id IN (?)", ids)
+				if res.Error != nil || res.RowsAffected == 0 {
+					return nil, errors.New("can't load questions for quiz with id " + fmt.Sprint(quizzes[i].ID))
+				}
+				storage.DB.Model(&quizzes[i]).Updates(&models.Quiz{
+					Questions: quizzes[i].Questions})
+			}
+		}
+	}
+	for _, quiz := range quizzes {
+		quizzDTOs = append(quizzDTOs, models.ToQuizDTO(quiz))
+	}
+	return quizzDTOs, nil
+}
+
 func GetQuizByID(id string) (*models.QuizDTO, error) {
 	quiz := &models.Quiz{}
 	res := storage.DB.Where("id = ?", id).Find(quiz)

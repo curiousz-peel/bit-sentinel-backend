@@ -31,11 +31,29 @@ func GetQuizByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not find the quiz, check if ID " + id + " exists",
-			"data":    err})
+			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "quiz fetched successfully",
 		"data":    quiz})
+}
+
+func GetQuizzesByCourseId(ctx *fiber.Ctx) error {
+	id := ctx.Params("courseId")
+	if id == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "course ID cannot be empty on get quizzes",
+			"data":    nil})
+	}
+	quizzes, err := service.GetQuizzesByCourseId(id)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find the quizzes, check if course with ID " + id + " exists",
+			"data":    err.Error()})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "quizzes fetched successfully",
+		"data":    quizzes})
 }
 
 func DeleteQuizByID(ctx *fiber.Ctx) error {
@@ -50,7 +68,7 @@ func DeleteQuizByID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not delete quiz, check if quiz with ID " + id + " exists",
-			"data":    err})
+			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{"message": "quiz deleted successfully"})
 }
@@ -61,14 +79,14 @@ func CreateQuiz(ctx *fiber.Ctx) error {
 	if err != nil {
 		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
 			"message": "failed to parse request body",
-			"data":    err})
+			"data":    err.Error()})
 		return err
 	}
 	quizDTO, err := service.CreateQuiz(quiz)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not create quiz",
-			"data":    err})
+			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "quiz created successfully",

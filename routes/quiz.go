@@ -11,6 +11,7 @@ func SetupQuizRoutes(router fiber.Router) {
 	quiz.Post("/", jwtHandler.ValidateToken, quizHandler.CreateQuiz)
 	quiz.Get("/", jwtHandler.ValidateToken, quizHandler.GetQuizzes)
 	quiz.Get("/:quizId", jwtHandler.ValidateToken, quizHandler.GetQuizByID)
+	quiz.Get("/course/:courseId", jwtHandler.ValidateToken, quizHandler.GetQuizzesByCourseId)
 	quiz.Put("/:quizId", jwtHandler.ValidateToken, quizHandler.UpdateQuizByID)
 	quiz.Put("addQuestions/:quizId", jwtHandler.ValidateToken, quizHandler.AddQuestionsToQuiz)
 	quiz.Delete("/:quizId", jwtHandler.ValidateToken, quizHandler.DeleteQuizByID)
