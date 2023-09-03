@@ -42,13 +42,31 @@ func GetCoursesBySubscription(ctx *fiber.Ctx) error {
 	subscriptionType := ctx.Params("subscriptionType")
 	if subscriptionType == "" {
 		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-			"message": "subscriptionType cannot be empty on get",
+			"message": "subscriptionType cannot be empty on get courses",
 			"data":    nil})
 	}
 	course, err := service.GetCoursesBySubscription(subscriptionType)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "could not find courses, check if subscriptionType " + subscriptionType + " exists",
+			"message": "could not find courses, check if courses with courses with subscriptionType " + subscriptionType + " exists",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "courses fetched successfully",
+		"data":    course})
+}
+
+func GetCoursesByAuthorId(ctx *fiber.Ctx) error {
+	authorId := ctx.Params("authorId")
+	if authorId == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "authorId cannot be empty on get",
+			"data":    nil})
+	}
+	course, err := service.GetCoursesByAuthorId(authorId)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not find courses, check if courses with authorId " + authorId + " exists",
 			"data":    err})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{

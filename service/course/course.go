@@ -221,6 +221,24 @@ func GetCoursesBySubscription(subscriptionType string) (*[]models.CourseDTO, err
 	return &coursesDTO, nil
 }
 
+func GetCoursesByAuthorId(id string) (*[]models.CourseDTO, error) {
+	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
+	sqlCondition := "authors_ids ? '" + id + "'"
+	err := storage.DB.Find(&courses, sqlCondition).Error
+	if err != nil {
+		return nil, errors.New("error in finding courses by " + id)
+	}
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
+	}
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
+}
+
 func populateCourses(courses []models.Course) ([]models.Course, error) {
 	for i := range courses {
 		if courses[i].AuthorsIDs != nil {

@@ -15,6 +15,7 @@ func SetupCourseRoutes(router fiber.Router) {
 	course.Get("/fundamental", jwtHandler.ValidateToken, courseHandler.GetCoursesFundamentalsForHome)
 	course.Get("/:courseId", jwtHandler.ValidateToken, courseHandler.GetCourseByID)
 	course.Get("/subscription/:subscriptionType", jwtHandler.ValidateToken, courseHandler.GetCoursesBySubscription)
+	course.Get("/author/:authorId", jwtHandler.ValidateToken, courseHandler.GetCoursesByAuthorId)
 	course.Put("/:courseId", jwtHandler.ValidateToken, courseHandler.UpdateCourseByID)
 	course.Put("/addAuthors:courseId", jwtHandler.ValidateToken, courseHandler.AddAuthorsToCourse)
 	course.Delete("/:courseId", jwtHandler.ValidateToken, courseHandler.DeleteCourseByID)

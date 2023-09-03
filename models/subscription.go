@@ -36,6 +36,7 @@ type SubscriptionPlanDTO struct {
 	SubscriptionType string    `json:"subscriptionType"`
 	StartDate        time.Time `json:"startDate"`
 	EndDate          time.Time `json:"endDate"`
+	Price            float32   `json:"price"`
 }
 
 func ToSubscriptionPlanDTO(subscriptionPlan SubscriptionPlan) SubscriptionPlanDTO {
@@ -46,6 +47,7 @@ func ToSubscriptionPlanDTO(subscriptionPlan SubscriptionPlan) SubscriptionPlanDT
 		StartDate:        subscriptionPlan.StartDate,
 		EndDate:          subscriptionPlan.EndDate,
 		SubscriptionType: subscriptionPlan.Subscription.Type,
+		Price:            subscriptionPlan.Subscription.Price,
 	}
 }
 
