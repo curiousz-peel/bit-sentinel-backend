@@ -34,6 +34,7 @@ type UpdateUser struct {
 	Password  string    `json:"password"`
 	Birthday  time.Time `json:"birthday"`
 	IsMod     bool      `json:"isModerator"`
+	IsAuthor  bool      `json:"isAuthor"`
 }
 
 type LoginUser struct {

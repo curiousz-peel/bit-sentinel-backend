@@ -49,15 +49,15 @@ func GetQuizzesByCourseId(courseId string) ([]models.QuizDTO, error) {
 	}
 	for i := range quizzes {
 		if quizzes[i].QuestionIDs != nil {
-			var ids []uint
+			var ids []string
 			err = json.Unmarshal(quizzes[i].QuestionIDs, &ids)
 			if err != nil {
 				return nil, err
 			}
 			if len(ids) > 0 {
 				res := storage.DB.Find(&quizzes[i].Questions, "id IN (?)", ids)
-				if res.Error != nil || res.RowsAffected == 0 {
-					return nil, errors.New("can't load questions for quiz with id " + fmt.Sprint(quizzes[i].ID))
+				if res.Error != nil {
+					return nil, errors.New("error in loading questions for quiz with id " + fmt.Sprint(quizzes[i].ID))
 				}
 				storage.DB.Model(&quizzes[i]).Updates(&models.Quiz{
 					Questions: quizzes[i].Questions})

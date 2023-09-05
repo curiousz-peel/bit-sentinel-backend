@@ -84,7 +84,6 @@ func UpdateAuthorByID(ctx *fiber.Ctx) error {
 			"message": "author ID cannot be empty on update",
 			"data":    nil})
 	}
-
 	var updateAuthorData models.UpdateAuthor
 	err := ctx.BodyParser(&updateAuthorData)
 	if err != nil {

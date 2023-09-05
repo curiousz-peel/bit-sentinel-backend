@@ -171,12 +171,13 @@ func GetCoursesByRatingForHome() (*[]models.CourseDTO, error) {
 func GetCoursesByMostRecentForHome() (*[]models.CourseDTO, error) {
 	courses := []models.Course{}
 	coursesDTO := []models.CourseDTO{}
-	err := storage.DB.Order("created_at desc").Limit(3).Find(&courses).Error
+	err := storage.DB.Debug().Order("created_at desc").Limit(3).Find(&courses).Error
 	if err != nil {
 		return nil, err
 	}
 	courses, err = populateCourses(courses)
 	if err != nil {
+		fmt.Println("HERE1")
 		return nil, err
 	}
 	for _, course := range courses {
@@ -190,6 +191,24 @@ func GetCoursesFundamentalsForHome() (*[]models.CourseDTO, error) {
 	coursesDTO := []models.CourseDTO{}
 	// err := storage.DB.Limit(3).Find(&courses, "included_subscriptions ? 'Basic'").Error
 	err := storage.DB.Limit(3).Find(&courses, "tags ? 'tag1'").Error
+	if err != nil {
+		return nil, err
+	}
+	courses, err = populateCourses(courses)
+	if err != nil {
+		return nil, err
+	}
+	for _, course := range courses {
+		coursesDTO = append(coursesDTO, models.ToCourseDTO(course))
+	}
+	return &coursesDTO, nil
+}
+
+func GetCoursesByTag(value string) (*[]models.CourseDTO, error) {
+	courses := []models.Course{}
+	coursesDTO := []models.CourseDTO{}
+	sql := "tags ? '" + value + "'"
+	err := storage.DB.Find(&courses, sql).Error
 	if err != nil {
 		return nil, err
 	}
@@ -250,6 +269,7 @@ func populateCourses(courses []models.Course) ([]models.Course, error) {
 			if len(ids) > 0 {
 				res := storage.DB.Find(&courses[i].Authors, "id IN (?)", ids)
 				if res.Error != nil || res.RowsAffected == 0 {
+					fmt.Println("HERE2")
 					return nil, errors.New("can't load authors for course with id " + fmt.Sprint(courses[i].ID))
 				}
 			}

@@ -184,7 +184,7 @@ func GetCoursesByMostRecentForHome(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not fetch most recent 3 courses",
-			"data":    err})
+			"data":    err.Error()})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "courses fetched successfully",
@@ -196,6 +196,24 @@ func GetCoursesFundamentalsForHome(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not fetch first 3 fundamental courses",
+			"data":    err})
+	}
+	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "courses fetched successfully",
+		"data":    courses})
+}
+
+func GetCoursesByTag(ctx *fiber.Ctx) error {
+	value := ctx.Params("value")
+	if value == "" {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "tag value cannot be empty on get courses by tag",
+			"data":    nil})
+	}
+	courses, err := service.GetCoursesByTag(value)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not fetch courses by tag " + value,
 			"data":    err})
 	}
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{

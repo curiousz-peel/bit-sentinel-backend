@@ -13,6 +13,7 @@ func SetupCourseRoutes(router fiber.Router) {
 	course.Get("/recent", jwtHandler.ValidateToken, courseHandler.GetCoursesByMostRecentForHome)
 	course.Get("/rating", jwtHandler.ValidateToken, courseHandler.GetCoursesByRatingForHome)
 	course.Get("/fundamental", jwtHandler.ValidateToken, courseHandler.GetCoursesFundamentalsForHome)
+	course.Get("/tag/:value", jwtHandler.ValidateToken, courseHandler.GetCoursesByTag)
 	course.Get("/:courseId", jwtHandler.ValidateToken, courseHandler.GetCourseByID)
 	course.Get("/subscription/:subscriptionType", jwtHandler.ValidateToken, courseHandler.GetCoursesBySubscription)
 	course.Get("/author/:authorId", jwtHandler.ValidateToken, courseHandler.GetCoursesByAuthorId)

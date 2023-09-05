@@ -7,6 +7,7 @@ import (
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
 	subscriptionPlanService "github.com/curiousz-peel/web-learning-platform-backend/service/subscription"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
+	"github.com/google/uuid"
 )
 
 func CreateUser(user *models.User) (*models.UserDTO, error) {
@@ -28,14 +29,25 @@ func UpdateUserByID(id string, updateUser models.UpdateUser) error {
 	if res.Error != nil || res.RowsAffected == 0 {
 		return errors.New("could not find the user, check if ID " + id + " exists")
 	}
-	storage.DB.Model(&user).Updates(&models.User{
+	if !updateUser.IsAuthor {
+		storage.DB.Debug().Model(&user).Updates(map[string]interface{}{
+			"IsAuthor": false,
+		})
+	}
+	if !updateUser.IsMod {
+		storage.DB.Debug().Model(&user).Updates(map[string]interface{}{
+			"IsMod": false,
+		})
+	}
+	storage.DB.Debug().Model(&user).Updates(&models.User{
 		FirstName: updateUser.FirstName,
 		LastName:  updateUser.LastName,
 		UserName:  updateUser.UserName,
 		Email:     updateUser.Email,
 		Password:  updateUser.Password,
 		Birthday:  updateUser.Birthday,
-		IsMod:     updateUser.IsMod})
+		IsMod:     updateUser.IsMod,
+		IsAuthor:  updateUser.IsAuthor})
 	return nil
 }
 
@@ -84,7 +96,8 @@ func GetUserByUsername(userName string) (*models.UserDTO, error) {
 
 func DeleteUserByID(id string) error {
 	user := &models.User{}
-	res := storage.DB.Unscoped().Delete(user, id)
+	userUUID, _ := uuid.Parse(id)
+	res := storage.DB.Unscoped().Delete(user, userUUID)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return errors.New("could not delete user with id " + id)
 	}

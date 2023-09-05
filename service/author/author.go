@@ -6,6 +6,7 @@ import (
 
 	"github.com/curiousz-peel/web-learning-platform-backend/models"
 	"github.com/curiousz-peel/web-learning-platform-backend/storage"
+	"github.com/google/uuid"
 )
 
 func GetAuthorByID(id string) (*models.AuthorDTO, error) {
@@ -48,7 +49,8 @@ func CreateAuthor(author *models.Author) (*models.AuthorDTO, error) {
 
 func UpdateAuthorByID(id string, updateAuthor models.UpdateAuthor) error {
 	author := &models.Author{}
-	res := storage.DB.Where("id = ?", id).Preload("User").Find(author)
+	autorUUID, _ := uuid.Parse(id)
+	res := storage.DB.Where("id = ?", autorUUID).Preload("User").Find(author)
 	if res.Error != nil || res.RowsAffected == 0 {
 		return errors.New("could not find the author with id " + id)
 	}
